@@ -69,46 +69,6 @@ namespace Library.Assignment1
         }
 
         /// <summary>
-        /// Edit the name, description, or deadline of the Task at the given index.
-        /// </summary>
-        /// <param name="index">zero-based index of the task to edit</param>
-        /// <param name="type">whether to update the name, description, or deadline</param>
-        /// <param name="newValue">a string represented the new value. must be a valid date string if type is for Deadline</param>
-        [Obsolete("Edit is obsolete. Use individual EditName, EditDescription, etc. instead.")]
-        public void Edit(int index, EditType type, string newValue)
-        {
-            // if outside the bounds, return without doing anything
-            if (index < 0 || index >= _tasks.Count)
-            {
-                return;
-            }
-
-            switch (type)
-            {
-                case EditType.Name:
-                {
-                    _tasks[index].Name = newValue;
-                    break;
-                }
-                case EditType.Description:
-                {
-                    _tasks[index].Description = newValue;
-                    break;
-                }
-                case EditType.Deadline:
-                {
-                    // it's not great, but the DateTime is passed in as a string so that
-                    // there can be a single Edit method instead of 2 or 3 separate ones.
-                    // not sure if this is actually better, but the public interface is somewhat
-                    // nicer maybe? regardless, assume the date is well-formatted and parse it
-                    DateTime deadline = DateTime.Parse(newValue);
-                    _tasks[index].Deadline = deadline;
-                    break;
-                }
-            }
-        }
-
-        /// <summary>
         /// Update the name of the Task at the given index.
         /// </summary>
         /// <param name="index">the index of the Task to update</param>
