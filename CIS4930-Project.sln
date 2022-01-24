@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bin.CIS4930", "CIS4930-Assignment1\Bin.CIS4930.csproj", "{F2F71458-08D3-48FC-875A-CAD0E81C3E34}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bin.CIS4930", "Bin.CIS4930\Bin.CIS4930.csproj", "{F2F71458-08D3-48FC-875A-CAD0E81C3E34}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.CIS4930", "Library.Assignment1\Lib.CIS4930.csproj", "{20A5CABA-305A-4F0E-B7CE-0C135568DF36}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.CIS4930", "Lib.CIS4930\Lib.CIS4930.csproj", "{20A5CABA-305A-4F0E-B7CE-0C135568DF36}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
