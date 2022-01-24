@@ -1,4 +1,6 @@
-# Assignment 1
-## Nicholas Fanguy - CIS4930
+# Nicholas Fanguy CIS4930 Project
 
-[Explanation Video](https://youtu.be/4K_U47YXdNU)
+## Assignment 1
+
+- branch: main
+- video: [here](https://youtu.be/4K_U47YXdNU)
