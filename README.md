@@ -2,5 +2,5 @@
 
 ## Assignment 1
 
-- branch: main
+- branch: master
 - video: [here](https://youtu.be/4K_U47YXdNU)
