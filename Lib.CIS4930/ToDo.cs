@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lib.CIS4930;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,8 @@ using System.Threading.Tasks;
 
 namespace Library.Assignment1
 {
-    public class Task
+    [Serializable]
+    public class ToDo : ITask
     {
         /// <summary>
         /// The display name of the to-do Task
@@ -28,7 +30,7 @@ namespace Library.Assignment1
         /// </summary>
         public bool IsCompleted { get; set; }
 
-        public Task(string name, string description, DateTime deadline, bool isCompleted = false)
+        public ToDo(string name, string description, DateTime deadline, bool isCompleted = false)
         {
             Name = name;
             Description = description;

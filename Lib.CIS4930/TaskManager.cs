@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Lib.CIS4930;
+using System.Runtime.Serialization.Formatters.Binary;
+using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace Library.Assignment1
 {
@@ -35,11 +34,15 @@ namespace Library.Assignment1
         /// </summary>
         public int Count { get => _tasks.Count; }
 
-        private List<Task> _tasks;
+        private List<ITask> _tasks;
+        private BinaryFormatter _serializer;
+
+        private const string SAVEFILE = "tasks.bin";
 
         public TaskManager()
         {
-            _tasks = new List<Task>();
+            _serializer = new BinaryFormatter();
+            Load();
         }
 
         /// <summary>
@@ -50,7 +53,14 @@ namespace Library.Assignment1
         /// <param name="deadline">when the task is due, in a valid DateTime</param>
         public void Create(string name, string description, DateTime deadline)
         {
-            _tasks.Add(new Task(name, description, deadline));
+            _tasks.Add(new ToDo(name, description, deadline));
+            Save();
+        }
+
+        public void Create(string name, string description, DateTime start, DateTime end, List<string> attendees)
+        {
+            _tasks.Add(new Appointment(name, description, start, end, attendees));
+            Save();
         }
 
         /// <summary>
@@ -66,6 +76,7 @@ namespace Library.Assignment1
             }
 
             _tasks.RemoveAt(index);
+            Save();
         }
 
         /// <summary>
@@ -82,6 +93,7 @@ namespace Library.Assignment1
             }
 
             _tasks[index].Name = newName;
+            Save();
         }
 
         /// <summary>
@@ -98,6 +110,7 @@ namespace Library.Assignment1
             }
 
             _tasks[index].Description = newDescription;
+            Save();
         }
 
         /// <summary>
@@ -113,7 +126,12 @@ namespace Library.Assignment1
                 return;
             }
 
-            _tasks[index].Deadline = newDeadline;
+            var task = _tasks[index];
+
+            if (task is ToDo todo)
+                todo.Deadline = newDeadline;
+
+            Save();
         }
 
         /// <summary>
@@ -129,7 +147,12 @@ namespace Library.Assignment1
                 return;
             }
 
-            _tasks[index].IsCompleted = newIsCompleted;
+            var task = _tasks[index];
+
+            if (task is ToDo todo)
+                todo.IsCompleted = newIsCompleted;
+
+            Save();
         }
 
         /// <summary>
@@ -144,7 +167,12 @@ namespace Library.Assignment1
                 return;
             }
 
-            _tasks[index].IsCompleted = true;
+            var task = _tasks[index];
+
+            if (task is ToDo todo)
+                todo.IsCompleted = true;
+
+            Save();
         }
 
         /// <summary>
@@ -156,8 +184,8 @@ namespace Library.Assignment1
             int displayed = 0;
             for (int i = 0; i < _tasks.Count; i++)
             {
-                Task task = _tasks[i];
-                if (task.IsCompleted && mode == ListMode.NotComplete)
+                var task = _tasks[i];
+                if (task is ToDo todo && todo.IsCompleted && mode == ListMode.NotComplete)
                 {
                     continue;
                 }
@@ -169,6 +197,41 @@ namespace Library.Assignment1
             if (displayed == 0)
             {
                 Console.WriteLine("Nothing to do for now!");
+            }
+        }
+
+        private void Save()
+        {
+            _serializer.Serialize(File.OpenWrite(SAVEFILE), _tasks);
+
+            /*
+            string fileName = "TEST.json";
+            string jsonString = JsonConvert.SerializeObject(_tasks); //JsonSerializer.Serialize(_tasks);
+            File.WriteAllText(fileName, jsonString);
+            */
+        }
+
+        private void Load()
+        {
+            if (File.Exists(SAVEFILE))
+            {
+                _tasks = (List<ITask>)_serializer.Deserialize(File.OpenRead(SAVEFILE));
+
+                /*
+                string fileName = "TEST.json";
+                string jsonString = File.ReadAllText(fileName);
+                var tasks = JsonConvert.DeserializeObject<List<ITask>>(jsonString, new JsonSerializerSettings()
+                {
+                    TypeNameHandling = TypeNameHandling.All,
+                });
+
+                foreach (var task in tasks)
+                    Console.WriteLine(task);
+                */
+            }
+            else
+            {
+                _tasks = new List<ITask>();
             }
         }
     }
