@@ -29,6 +29,12 @@ namespace Library.Assignment1
             NotComplete
         }
 
+        public enum TaskType
+        { 
+            ToDo,
+            Appointment
+        }
+
         /// <summary>
         /// Returns the number of current tasks, both complete and incomplete.
         /// </summary>
@@ -179,16 +185,20 @@ namespace Library.Assignment1
         /// Print the list of Tasks to the console, dictated by the given mode
         /// </summary>
         /// <param name="mode">what Tasks to show, either all of them or only incomplete ones</param>
-        public void List(ListMode mode)
+        public void ListToDos(ListMode mode)
         {
             int displayed = 0;
             for (int i = 0; i < _tasks.Count; i++)
             {
                 var task = _tasks[i];
-                if (task is ToDo todo && todo.IsCompleted && mode == ListMode.NotComplete)
-                {
+
+                if (task is not ToDo)
                     continue;
-                }
+
+                var todo = task as ToDo;
+
+                if (todo.IsCompleted && mode == ListMode.NotComplete)
+                    continue;
 
                 Console.WriteLine($"{i}: {task}");
                 displayed++;
@@ -200,9 +210,90 @@ namespace Library.Assignment1
             }
         }
 
+        public void ListAppointments()
+        {
+            int displayed = 0;
+            for (int i = 0; i < _tasks.Count; i++)
+            {
+                var task = _tasks[i];
+
+                if (task is not Appointment)
+                    continue;
+
+                Console.WriteLine($"{i}: {task}");
+                displayed++;
+            }
+
+            if (displayed == 0)
+            {
+                Console.WriteLine("No appointments for now!");
+            }
+        }
+
+        public void Search(string searchTerm)
+        {
+            searchTerm = searchTerm.ToLower();
+            var ignoreCase = StringComparison.OrdinalIgnoreCase;
+
+            List<ITask> results = new List<ITask>();
+
+            foreach (var task in _tasks)
+            {
+                if (task.Name.Contains(searchTerm, ignoreCase) || task.Description.Contains(searchTerm, ignoreCase)) 
+                { 
+                    results.Add(task);
+                    continue;
+                }
+
+                if (task is ToDo todo)
+                {
+                    if (todo.Deadline.ToLongDateString().Contains(searchTerm, ignoreCase)) 
+                    { 
+                        results.Add(task);
+                        continue;
+                    }
+                }    
+                else if (task is Appointment appt)
+                {
+                    if (appt.Start.ToLongDateString().Contains(searchTerm, ignoreCase))
+                    {
+                        results.Add(task);
+                        continue;
+                    }
+
+                    if (appt.End.ToLongDateString().Contains(searchTerm, ignoreCase))
+                    {
+                        results.Add(task);
+                        continue;
+                    }
+
+                    foreach (var attendee in appt.Attendees)
+                    {
+                        if (attendee.Contains(searchTerm, ignoreCase))
+                        {
+                            results.Add(task);
+                            continue;
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < _tasks.Count; i++)
+            {
+                var task = _tasks[i];
+
+                if (results.Contains(task))
+                {
+                    Console.WriteLine($"{i}: {task}");
+                }
+            }
+        }
+
         private void Save()
         {
-            _serializer.Serialize(File.OpenWrite(SAVEFILE), _tasks);
+            var file = File.OpenWrite(SAVEFILE);
+            _serializer.Serialize(file, _tasks);
+            file.Close();
 
             /*
             string fileName = "TEST.json";
@@ -215,7 +306,9 @@ namespace Library.Assignment1
         {
             if (File.Exists(SAVEFILE))
             {
-                _tasks = (List<ITask>)_serializer.Deserialize(File.OpenRead(SAVEFILE));
+                var file = File.OpenRead(SAVEFILE);
+                _tasks = (List<ITask>)_serializer.Deserialize(file);
+                file.Close();
 
                 /*
                 string fileName = "TEST.json";

@@ -9,7 +9,7 @@ namespace Assignment1
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("*** CIS4930 To Do Manager ***");
+            Utils.PrintBlue("*** CIS4930 Task Manager ***");
 
             // initialize some basic classes
             var actionManager = new ActionManager();
@@ -21,6 +21,7 @@ namespace Assignment1
             commandParser.Add("edit",     actionManager.Edit);
             commandParser.Add("complete", actionManager.Complete);
             commandParser.Add("list",     actionManager.List);
+            commandParser.Add("search",   actionManager.Search);
             commandParser.Add("help",     actionManager.PrintHelp);
 
             // before running the REPL, print the help message
@@ -30,7 +31,7 @@ namespace Assignment1
             var repl = new REPL("todo$ ", commandParser);
             repl.Run();
 
-            Console.WriteLine("*** Thanks for using the CIS4930 To Do Manager ***");
+            Utils.PrintBlue("*** CIS4930 Task Manager ***");
         }
     }
 }

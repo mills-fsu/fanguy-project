@@ -22,8 +22,8 @@ namespace CIS4930_Assignment1
         /// </summary>
         public void PrintHelp()
         {
-            Console.WriteLine("\nThis is the CIS4930 To Do Manager");
-            Console.WriteLine("Available commands are: quit|exit, help, create, delete, edit, complete, and list\n");
+            Console.WriteLine("\nThis is the CIS4930 Task Manager");
+            Console.WriteLine("Available commands are: quit|exit, help, create, delete, edit, complete, search, and list\n");
         }
 
         /// <summary>
@@ -32,6 +32,8 @@ namespace CIS4930_Assignment1
         public void Create()
         {
             Console.WriteLine();
+
+            var type = Utils.GetTaskType();
 
             // name is required, so wait until it can be gotten
             string name = Utils.GetNonEmptyStringInput("name: ");
@@ -42,30 +44,34 @@ namespace CIS4930_Assignment1
             // prefer the empty string to null
             string description = input ?? "";
 
-            DateTime deadline;
+            if (type == TaskType.ToDo)
+                CreateToDo(name, description);
+            else if (type == TaskType.Appointment)
+                CreateAppointment(name, description);
 
-            while (true)
-            {
-                // first, wait until a non-empty string is given
-                string deadlineIn = Utils.GetNonEmptyStringInput("deadline: ");
+            Console.WriteLine("\nTask added succesfully!\n");
+        }
 
-                // then, make sure the given string is a valid date. if not, repeat
-                // the whole process
-                try
-                {
-                    deadline = DateTime.Parse(deadlineIn);
-                    break;
-                }
-                catch (FormatException)
-                {
-                    Console.WriteLine("Invalid date format entered. Please try again.");
-                }
-            }
+        private void CreateToDo(string name, string description)
+        {
+            var deadline = Utils.GetValidDate("deadline: ");
 
             // finally, input has been sanitized, so let the manager handle creation
             _manager.Create(name, description, deadline);
+        }
 
-            Console.WriteLine("\nTo Do added succesfully!\n");
+        private void CreateAppointment(string name, string description)
+        {
+            var start = Utils.GetValidDate("starting date (include time): ");
+            var hours = Utils.GetValidInteger("event length (in hours): ");
+            var end = start.AddHours(hours);
+
+            Console.WriteLine("other attendees (separated by commas): ");
+            var rawAttendees = Console.ReadLine() ?? "";
+            var attendees = rawAttendees.Split(',').ToList();
+            attendees.ForEach(a => a = a.Trim());
+
+            _manager.Create(name, description, start, end, attendees);
         }
 
         /// <summary>
@@ -232,9 +238,25 @@ namespace CIS4930_Assignment1
             }
 
             // finally, input is safe, so print the list
-            Console.WriteLine("\nYour To-Do List");
+            Console.WriteLine("\nYour Tasks");
             Console.WriteLine("---------------");
-            _manager.List(mode);
+
+            Console.WriteLine("ToDos:");
+            _manager.ListToDos(mode);
+
+            Console.WriteLine("\nAppointments:");
+            _manager.ListAppointments();
+
+            Console.WriteLine();
+        }
+
+        public void Search()
+        {
+            Console.WriteLine();
+
+            string searchTerm = Utils.GetNonEmptyStringInput("search for: ");
+
+            _manager.Search(searchTerm);
 
             Console.WriteLine();
         }

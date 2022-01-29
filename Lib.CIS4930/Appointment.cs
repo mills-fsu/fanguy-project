@@ -29,7 +29,7 @@ namespace Lib.CIS4930
             // full short date format
             var startTime = Start.ToString("g");
             var endTime = End.ToShortTimeString();
-            var participants = string.Join(", ", Attendees);
+            var participants = string.Join(",", Attendees);
             return $"{Name} [{startTime}-{endTime}]\n   notes: {Description}\n   participants: {participants}";
         }
     }
