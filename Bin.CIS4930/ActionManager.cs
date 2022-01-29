@@ -18,21 +18,10 @@ namespace CIS4930_Assignment1
         }
 
         /// <summary>
-        /// Print a basic help message about available commands.
-        /// </summary>
-        public void PrintHelp()
-        {
-            Console.WriteLine("\nThis is the CIS4930 Task Manager");
-            Console.WriteLine("Available commands are: quit|exit, help, create, delete, edit, complete, search, and list\n");
-        }
-
-        /// <summary>
         /// Prompt user for information and then create a new managed Task.
         /// </summary>
         public void Create()
         {
-            Console.WriteLine();
-
             var type = Utils.GetTaskType();
 
             // name is required, so wait until it can be gotten
@@ -49,7 +38,7 @@ namespace CIS4930_Assignment1
             else if (type == TaskType.Appointment)
                 CreateAppointment(name, description);
 
-            Console.WriteLine("\nTask added succesfully!\n");
+            Utils.PrintGreen("\nTask added succesfully!");
         }
 
         private void CreateToDo(string name, string description)
@@ -79,13 +68,11 @@ namespace CIS4930_Assignment1
         /// </summary>
         public void Delete()
         {
-            Console.WriteLine();
-
             // get a valid integer in the correct range, then let the manager delete at that point
             int toDelete = Utils.GetIndexInput("index of the task to delete: ", _manager.Count - 1);
             _manager.Delete(toDelete);
 
-            Console.WriteLine("\nTo Do deleted successfully!\n");
+            Utils.PrintGreen("\nTask deleted successfully!");
         }
 
         /// <summary>
@@ -93,13 +80,81 @@ namespace CIS4930_Assignment1
         /// </summary>
         public void Edit()
         {
-            Console.WriteLine();
-
             // get a valid integer in the correct range
             int toEdit = Utils.GetIndexInput("index of the task to edit: ", _manager.Count - 1);
 
-            EditType editType;
+            var type = _manager.TypeOf(toEdit);
 
+            EditType editType = type switch
+            {
+                TaskType.ToDo => GetTodoEditType(),
+                TaskType.Appointment => GetAppointmentEditType()
+            };
+
+            string newValue;
+
+            // now we must get a valid new value for the specified field
+            while (true)
+            {
+                // get a non-empty string to start
+                string input = Utils.GetNonEmptyStringInput("new value for the field: ");
+
+                // if we are updating the deadline, try to parse the string
+                // if we cannot, reprompt the user until a valid date is given.
+                if (editType == EditType.Deadline || editType == EditType.Start || editType == EditType.End)
+                {
+                    try
+                    {
+                        DateTime.Parse(input);
+                    }
+                    catch (FormatException)
+                    {
+                        Console.WriteLine("Please enter a valid date.");
+                        continue;
+                    }
+                }
+                else if (editType == EditType.IsCompleted)
+                {
+                    try
+                    {
+                        bool.Parse(input);
+                    }
+                    catch (FormatException)
+                    {
+                        Console.WriteLine("Please enter either 'true' or 'false'.");
+                        continue;
+                    }
+                }
+
+                // at this point, the input is safe to be used as the new value
+                newValue = input;
+                break;
+            }
+
+            switch (editType)
+            {
+                case EditType.Name: _manager.EditName(toEdit, newValue);
+                    break;
+                case EditType.Description: _manager.EditDescription(toEdit, newValue);
+                    break;
+                case EditType.Deadline: _manager.EditDeadline(toEdit, DateTime.Parse(newValue));
+                    break;
+                case EditType.IsCompleted: _manager.EditIsCompleted(toEdit, bool.Parse(newValue));
+                    break;
+                case EditType.Start: _manager.EditStart(toEdit, DateTime.Parse(newValue));
+                    break;
+                case EditType.End: _manager.EditEnd(toEdit, DateTime.Parse(newValue));
+                    break;
+                case EditType.Attendees: _manager.EditAttendees(toEdit, newValue.Split(","));
+                    break;
+            }
+
+            Utils.PrintGreen("\nTask updated succesfully!");
+        }
+
+        private EditType GetTodoEditType()
+        {
+            EditType editType;
             // then, get a valid editType
             while (true)
             {
@@ -131,63 +186,48 @@ namespace CIS4930_Assignment1
 
                 break;
             }
+            return editType;
+        }
 
-            string newValue;
-
-            // now we must get a valid new value for the specified field
+        private EditType GetAppointmentEditType()
+        {
+            EditType editType;
+            // then, get a valid editType
             while (true)
             {
-                // get a non-empty string to start
-                string input = Utils.GetNonEmptyStringInput("new value for the field: ");
+                // get a non-empty string
+                string fieldName = Utils.GetNonEmptyStringInput("what would you like to edit? (name, description, start, end, attendees): ");
 
-                // if we are updating the deadline, try to parse the string
-                // if we cannot, reprompt the user until a valid date is given.
-                if (editType == EditType.Deadline)
+                // make sure it is either name, description, or deadline. repeat this loop if not
+                if (fieldName == "name")
                 {
-                    try
-                    {
-                        DateTime.Parse(input);
-                    }
-                    catch (FormatException)
-                    {
-                        Console.WriteLine("Please enter a valid date.");
-                        continue;
-                    }
+                    editType = EditType.Name;
                 }
-                else if (editType == EditType.IsCompleted)
+                else if (fieldName == "description")
                 {
-                    try
-                    {
-                        bool.Parse(input);
-                    }
-                    catch (FormatException)
-                    {
-                        Console.WriteLine("Please enter either 'true' or 'false'.");
-                        continue;
-                    }
+                    editType = EditType.Description;
+                }
+                else if (fieldName == "start")
+                {
+                    editType = EditType.Start;
+                }
+                else if (fieldName == "end")
+                {
+                    editType = EditType.End;
+                }
+                else if (fieldName == "attendees")
+                {
+                    editType = EditType.Attendees;
+                }
+                else
+                {
+                    Console.WriteLine("Please enter 'name', 'description', 'start', 'end', or 'attendees'.");
+                    continue;
                 }
 
-                // at this point, the input is safe to be used as the new value
-                newValue = input;
                 break;
             }
-
-            // let the manager handle editing the underlying Task
-            // _manager.Edit(toEdit, editType, newValue);
-
-            switch (editType)
-            {
-                case EditType.Name: _manager.EditName(toEdit, newValue);
-                    break;
-                case EditType.Description: _manager.EditDescription(toEdit, newValue);
-                    break;
-                case EditType.Deadline: _manager.EditDeadline(toEdit, DateTime.Parse(newValue));
-                    break;
-                case EditType.IsCompleted: _manager.EditIsCompleted(toEdit, bool.Parse(newValue));
-                    break;
-            }
-
-            Console.WriteLine("\nTo Do updated succesfully!\n");
+            return editType;
         }
 
         /// <summary>
@@ -195,13 +235,11 @@ namespace CIS4930_Assignment1
         /// </summary>
         public void Complete()
         {
-            Console.WriteLine();
-
             // get a valid integer in the correct range, then let the manager handle marking it complete
             int toComplete = Utils.GetIndexInput("index of the task to complete: ", _manager.Count - 1);
             _manager.Complete(toComplete);
 
-            Console.WriteLine("\nTo Do marked as complete succesfully!\n");
+            Utils.PrintGreen("\nTo Do marked as complete succesfully!");
         }
 
         /// <summary>
@@ -209,56 +247,120 @@ namespace CIS4930_Assignment1
         /// </summary>
         public void List()
         {
-            Console.WriteLine();
-
             ListMode mode;
 
             while (true)
             {
                 // get a non-empty string
-                string input = Utils.GetNonEmptyStringInput("incomplete OR all: ");
+                string input = Utils.GetNonEmptyStringInput("show todos only ('todo'), appointments only ('appt'), or 'both': ");
 
                 // we must make sure the input was valid. if not, reprompt until a correct
                 // answer is given
-                if (input == "incomplete")
-                {
-                    mode = ListMode.NotComplete;
-                }
-                else if (input == "all")
-                {
-                    mode = ListMode.All;
-                }
+                if (input == "todo")
+                    mode = ListMode.TodosOnly;
+                else if (input == "appt")
+                    mode = ListMode.AppointmentsOnly;
+                else if (input == "both")
+                    mode = ListMode.Both;
                 else
                 {
-                    Console.WriteLine("Please enter either 'incomplete' or 'all'.");
+                    Utils.PrintRed("Please enter either 'todo', 'appt', or 'both'.");
                     continue;
                 }
 
                 break;
             }
 
-            // finally, input is safe, so print the list
-            Console.WriteLine("\nYour Tasks");
-            Console.WriteLine("---------------");
+            TodoFilterMode todoFilter = TodoFilterMode.All;
 
-            Console.WriteLine("ToDos:");
-            _manager.ListToDos(mode);
+            if (mode == ListMode.TodosOnly || mode == ListMode.Both)
+            {
+                while (true)
+                {
+                    // get a non-empty string
+                    string input = Utils.GetNonEmptyStringInput("show 'incomplete' todos OR 'all': ");
 
-            Console.WriteLine("\nAppointments:");
-            _manager.ListAppointments();
+                    // we must make sure the input was valid. if not, reprompt until a correct
+                    // answer is given
+                    if (input == "incomplete")
+                    {
+                        todoFilter = TodoFilterMode.NotComplete;
+                    }
+                    else if (input == "all")
+                    {
+                        todoFilter = TodoFilterMode.All;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Please enter either 'incomplete' or 'all'.");
+                        continue;
+                    }
 
-            Console.WriteLine();
+                    break;
+                }
+            }
+
+            int startIndex = 0;
+            int numItems = 5;
+            var maxCount = mode switch
+            {
+                ListMode.TodosOnly        => _manager.TodosCount,
+                ListMode.AppointmentsOnly => _manager.AppointmentsCount,
+                _                         => _manager.Count,
+            };
+            int totalPages = (int) Math.Ceiling(maxCount / 5.0f);
+            int currentPage = 1;
+
+            while (true)
+            {
+                Console.WriteLine("q to finish, arrow keys to navigate");
+                Console.WriteLine($"page {currentPage}/{totalPages}");
+
+                Console.WriteLine("\nYour Tasks");
+                Console.WriteLine("---------------");
+
+                if (mode == ListMode.TodosOnly || mode == ListMode.Both)
+                {
+                    Console.WriteLine("ToDos:");
+                    _manager.ListToDos(mode, todoFilter, startIndex, numItems);
+                }
+
+                if (mode == ListMode.AppointmentsOnly || mode == ListMode.Both)
+                {
+                    Console.WriteLine("\nAppointments:");
+                    _manager.ListAppointments(mode, startIndex, numItems);
+                }
+
+                var key = Console.ReadKey(true).Key;
+
+                if (key == ConsoleKey.Q)
+                    break;
+                else if (key == ConsoleKey.RightArrow)
+                {
+                    currentPage++;
+                    startIndex += 5;
+                    Console.Clear();
+                }
+                else if (key == ConsoleKey.LeftArrow)
+                {
+                    currentPage--;
+                    startIndex -= 5;
+                    Console.Clear();
+                }
+
+                startIndex = Math.Clamp(startIndex, 0, (totalPages * 5) - 5);
+                currentPage = Math.Clamp(currentPage, 1, totalPages);
+            }
         }
 
         public void Search()
         {
-            Console.WriteLine();
-
             string searchTerm = Utils.GetNonEmptyStringInput("search for: ");
 
-            _manager.Search(searchTerm);
+            Console.WriteLine("\nResults");
+            Console.WriteLine("---------------");
 
-            Console.WriteLine();
+            _manager.Search(searchTerm);
         }
 
         /// <summary>
@@ -266,7 +368,7 @@ namespace CIS4930_Assignment1
         /// </summary>
         public void UnrecognizedCommand()
         {
-            Console.WriteLine("\nThat command was not recognized. Please try again.\n");
+            Utils.PrintRed("\nThat command was not recognized. Please try again.\n");
         }
     }
 }

@@ -13,20 +13,33 @@ namespace Library.Assignment1
         /// </summary>
         public enum EditType
         {
+            // ITask
             Name,
             Description,
+            // ToDo
             Deadline,
-            IsCompleted
+            IsCompleted,
+            // Appointment
+            Start,
+            End,
+            Attendees
         }
 
         /// <summary>
         /// How to display the list, either showing all items or only
         /// incomplete ones.
         /// </summary>
-        public enum ListMode
+        public enum TodoFilterMode
         {
             All,
             NotComplete
+        }
+
+        public enum ListMode
+        {
+            TodosOnly,
+            AppointmentsOnly,
+            Both
         }
 
         public enum TaskType
@@ -40,6 +53,11 @@ namespace Library.Assignment1
         /// </summary>
         public int Count { get => _tasks.Count; }
 
+        public int TodosCount { get => _tasks.Where(t => t is ToDo).Count(); }
+
+        public int AppointmentsCount { get => _tasks.Where(t => t is Appointment).Count(); }
+
+
         private List<ITask> _tasks;
         private BinaryFormatter _serializer;
 
@@ -49,6 +67,16 @@ namespace Library.Assignment1
         {
             _serializer = new BinaryFormatter();
             Load();
+        }
+
+        public TaskType TypeOf(int index)
+        {
+            var task = _tasks[index];
+
+            if (task is ToDo)
+                return TaskType.ToDo;
+            else
+                return TaskType.Appointment;
         }
 
         /// <summary>
@@ -63,9 +91,9 @@ namespace Library.Assignment1
             Save();
         }
 
-        public void Create(string name, string description, DateTime start, DateTime end, List<string> attendees)
+        public void Create(string name, string description, DateTime start, DateTime end, IEnumerable<string> attendees)
         {
-            _tasks.Add(new Appointment(name, description, start, end, attendees));
+            _tasks.Add(new Appointment(name, description, start, end, attendees.ToList()));
             Save();
         }
 
@@ -161,6 +189,54 @@ namespace Library.Assignment1
             Save();
         }
 
+        public void EditStart(int index, DateTime newStart)
+        {
+            // if outside the bounds, return without doing anything
+            if (index < 0 || index >= _tasks.Count)
+            {
+                return;
+            }
+
+            var task = _tasks[index];
+
+            if (task is Appointment appt)
+                appt.Start = newStart;
+
+            Save();
+        }
+
+        public void EditEnd(int index, DateTime newEnd)
+        {
+            // if outside the bounds, return without doing anything
+            if (index < 0 || index >= _tasks.Count)
+            {
+                return;
+            }
+
+            var task = _tasks[index];
+
+            if (task is Appointment appt)
+                appt.Start = newEnd;
+
+            Save();
+        }
+
+        public void EditAttendees(int index, IEnumerable<string> newAttendees)
+        {
+            // if outside the bounds, return without doing anything
+            if (index < 0 || index >= _tasks.Count)
+            {
+                return;
+            }
+
+            var task = _tasks[index];
+
+            if (task is Appointment appt)
+                appt.Attendees = newAttendees.ToList();
+
+            Save();
+        }
+
         /// <summary>
         /// Mark a Task as complete.
         /// </summary>
@@ -181,14 +257,32 @@ namespace Library.Assignment1
             Save();
         }
 
+        private delegate bool ListCondition(int index, int displayed, int startIndex, int numTasks, int taskCount);
+
+        private bool OnlyCondition(int index, int displayed, int startIndex, int numTasks, int taskCount)
+        {
+            return index < taskCount && displayed < numTasks;
+        }
+
+        private bool BothCondition(int index, int displayed, int startIndex, int numTasks, int taskCount)
+        {
+            return index < taskCount && index < startIndex + numTasks;
+        }
+
         /// <summary>
         /// Print the list of Tasks to the console, dictated by the given mode
         /// </summary>
-        /// <param name="mode">what Tasks to show, either all of them or only incomplete ones</param>
-        public void ListToDos(ListMode mode)
+        /// <param name="filter">what Tasks to show, either all of them or only incomplete ones</param>
+        public void ListToDos(ListMode mode, TodoFilterMode filter, int startIndex, int numTasks)
         {
+            ListCondition condition = mode switch
+            {
+                ListMode.TodosOnly => OnlyCondition,
+                _                  => BothCondition
+            };
+
             int displayed = 0;
-            for (int i = 0; i < _tasks.Count; i++)
+            for (int i = startIndex; condition(i, displayed, startIndex, numTasks, _tasks.Count); i++ )
             {
                 var task = _tasks[i];
 
@@ -197,7 +291,7 @@ namespace Library.Assignment1
 
                 var todo = task as ToDo;
 
-                if (todo.IsCompleted && mode == ListMode.NotComplete)
+                if (todo.IsCompleted && filter == TodoFilterMode.NotComplete)
                     continue;
 
                 Console.WriteLine($"{i}: {task}");
@@ -210,10 +304,16 @@ namespace Library.Assignment1
             }
         }
 
-        public void ListAppointments()
+        public void ListAppointments(ListMode mode, int startIndex, int numTasks)
         {
+            ListCondition condition = mode switch
+            {
+                ListMode.AppointmentsOnly => OnlyCondition,
+                _                         => BothCondition
+            };
+
             int displayed = 0;
-            for (int i = 0; i < _tasks.Count; i++)
+            for (int i = startIndex; condition(i, displayed, startIndex, numTasks, _tasks.Count); i++)
             {
                 var task = _tasks[i];
 

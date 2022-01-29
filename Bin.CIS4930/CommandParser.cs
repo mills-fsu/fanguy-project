@@ -38,6 +38,18 @@ namespace CIS4930_Assignment1
             _actions.Add(actionName, action);
         }
 
+        public void Help()
+        {
+            Console.WriteLine();
+            Console.Write("commands: ");
+
+            var commands = _actions.ToList().Select(p => p.Key).ToList();
+            var commandStr = string.Join(", ", commands);
+
+            Console.Write(commandStr);
+            Console.WriteLine();
+        }
+
         /// <summary>
         /// Try to match the given command text and invoke its action, calling
         /// the fallback action if necessary.
@@ -56,7 +68,9 @@ namespace CIS4930_Assignment1
             // if we can find the command in the Dictionary, invoke its associated action
             if (_actions.ContainsKey(command))
             {
+                Console.Clear();
                 _actions[command].Invoke();
+                Console.WriteLine();
             }
             // otherwise, invoke the fallback action
             else

@@ -89,20 +89,43 @@ namespace CIS4930_Assignment1
                 // first, wait until a non-empty string is given
                 string dateIn = Utils.GetNonEmptyStringInput(prompt);
 
-                // then, make sure the given string is a valid date. if not, repeat
-                // the whole process
+                // then, make sure the given string is a valid date. if not, repeat the whole process
                 try
                 {
                     date = DateTime.Parse(dateIn);
-                    break;
                 }
                 catch (FormatException)
                 {
                     PrintRed("Invalid date format entered. Please try again.");
+                    continue;
                 }
-            }
 
-            return date;
+                return date;
+            }
+        }
+
+        public static bool GetValidBool(string prompt)
+        {
+            bool val;
+
+            while (true)
+            {
+                // first, wait until a non-empty string is given
+                string input = GetNonEmptyStringInput(prompt);
+
+                // then, make sure the given string is a valid date. if not, repeat the whole process
+                try
+                {
+                    val = bool.Parse(input);
+                }
+                catch (FormatException)
+                {
+                    PrintRed("Invalid boolean entered. Please try again.");
+                    continue;
+                }
+
+                return val;
+            }
         }
 
         public static TaskType GetTaskType()

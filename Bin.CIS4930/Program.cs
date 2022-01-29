@@ -22,10 +22,11 @@ namespace Assignment1
             commandParser.Add("complete", actionManager.Complete);
             commandParser.Add("list",     actionManager.List);
             commandParser.Add("search",   actionManager.Search);
-            commandParser.Add("help",     actionManager.PrintHelp);
+            commandParser.Add("help",     commandParser.Help); //actionManager.PrintHelp);
+            commandParser.Add("clear",    Console.Clear);
 
             // before running the REPL, print the help message
-            actionManager.PrintHelp();
+            commandParser.Help();
 
             // create the REPL and then start running it
             var repl = new REPL("todo$ ", commandParser);
