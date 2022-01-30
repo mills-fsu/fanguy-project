@@ -38,6 +38,9 @@ namespace CIS4930_Assignment1
             _actions.Add(actionName, action);
         }
 
+        /// <summary>
+        /// Dynamically analyzes the commands added to the Dictionary nd prints them to the screen.
+        /// </summary>
         public void Help()
         {
             Console.WriteLine();

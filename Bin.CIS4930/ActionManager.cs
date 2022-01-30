@@ -41,6 +41,11 @@ namespace CIS4930_Assignment1
             Utils.PrintGreen("\nTask added succesfully!");
         }
 
+        /// <summary>
+        /// Create a new managed ToDo
+        /// </summary>
+        /// <param name="name">name of the ToDo</param>
+        /// <param name="description">description of the ToDo</param>
         private void CreateToDo(string name, string description)
         {
             var deadline = Utils.GetValidDate("deadline: ");
@@ -49,17 +54,26 @@ namespace CIS4930_Assignment1
             _manager.Create(name, description, deadline);
         }
 
+        /// <summary>
+        /// Create a new mananged Appointment
+        /// </summary>
+        /// <param name="name">name of the Appointment</param>
+        /// <param name="description">description of the Appointment</param>
         private void CreateAppointment(string name, string description)
         {
+            // use Utils function to grab the start and end dates
             var start = Utils.GetValidDate("starting date (include time): ");
             var hours = Utils.GetValidInteger("event length (in hours): ");
             var end = start.AddHours(hours);
 
+            // then get the attendees and use some LINQ to convert it to a
+            // list of names
             Console.WriteLine("other attendees (separated by commas): ");
             var rawAttendees = Console.ReadLine() ?? "";
             var attendees = rawAttendees.Split(',').ToList();
             attendees.ForEach(a => a = a.Trim());
 
+            // and let the _manager handle the actual creation
             _manager.Create(name, description, start, end, attendees);
         }
 
@@ -152,6 +166,10 @@ namespace CIS4930_Assignment1
             Utils.PrintGreen("\nTask updated succesfully!");
         }
 
+        /// <summary>
+        /// Get the data field to update for a ToDo
+        /// </summary>
+        /// <returns>either name, description, deadline, or completed based on input</returns>
         private EditType GetTodoEditType()
         {
             EditType editType;
@@ -180,7 +198,7 @@ namespace CIS4930_Assignment1
                 }
                 else
                 {
-                    Console.WriteLine("Please enter 'name', 'description', 'deadline' or 'completed'.");
+                    Utils.PrintRed("Please enter 'name', 'description', 'deadline' or 'completed'.");
                     continue;
                 }
 
@@ -189,6 +207,10 @@ namespace CIS4930_Assignment1
             return editType;
         }
 
+        /// <summary>
+        /// Get the data field to update for an Appointment
+        /// </summary>
+        /// <returns>either name, description, start, end, or attendees</returns>
         private EditType GetAppointmentEditType()
         {
             EditType editType;
@@ -221,7 +243,7 @@ namespace CIS4930_Assignment1
                 }
                 else
                 {
-                    Console.WriteLine("Please enter 'name', 'description', 'start', 'end', or 'attendees'.");
+                    Utils.PrintRed("Please enter 'name', 'description', 'start', 'end', or 'attendees'.");
                     continue;
                 }
 
@@ -247,6 +269,7 @@ namespace CIS4930_Assignment1
         /// </summary>
         public void List()
         {
+            // whether to display tasks only, appointments only, or both
             ListMode mode;
 
             while (true)
@@ -271,8 +294,11 @@ namespace CIS4930_Assignment1
                 break;
             }
 
+            // whether to display just incomplete or all ToDos
             TodoFilterMode todoFilter = TodoFilterMode.All;
 
+            // we only filter ToDos if we will be showing ToDos, so only prompt the user
+            // if they selected ToDos only or Both
             if (mode == ListMode.TodosOnly || mode == ListMode.Both)
             {
                 while (true)
@@ -300,15 +326,23 @@ namespace CIS4930_Assignment1
                 }
             }
 
+            // the index to start the page at
             int startIndex = 0;
+            // how many items to show on the page
             int numItems = 5;
+            // the count of applicable objects, depending on the list's mode
+            // if we are only showing one type or the other, only get the count of those objects
+            // instead of the whole _tasks list count
             var maxCount = mode switch
             {
                 ListMode.TodosOnly        => _manager.TodosCount,
                 ListMode.AppointmentsOnly => _manager.AppointmentsCount,
                 _                         => _manager.Count,
             };
+            // each page has 5 items, so divide the count by 5; we must use the ceiling
+            // since any decimal indicates some overflow and thus a new, partially-filled page
             int totalPages = (int) Math.Ceiling(maxCount / 5.0f);
+            // start off at the first page
             int currentPage = 1;
 
             while (true)
@@ -331,28 +365,39 @@ namespace CIS4930_Assignment1
                     _manager.ListAppointments(mode, startIndex, numItems);
                 }
 
+                // wait until the user enters a key
                 var key = Console.ReadKey(true).Key;
 
+                // and process it
                 if (key == ConsoleKey.Q)
                     break;
                 else if (key == ConsoleKey.RightArrow)
                 {
+                    // we blindly increment these values since they will be clamped
                     currentPage++;
                     startIndex += 5;
                     Console.Clear();
                 }
                 else if (key == ConsoleKey.LeftArrow)
                 {
+                    // similarly, we blindly decrement these values
                     currentPage--;
                     startIndex -= 5;
                     Console.Clear();
                 }
 
-                startIndex = Math.Clamp(startIndex, 0, (totalPages * 5) - 5);
+                // now, clamp the two pertinent values; the upper range on startIndex is a bit cryptic
+                // but basically just says that we can't exceed the starting index of the final possible
+                // page. we can't clamp it to the count of the entire list since that would allow a starting index
+                // at the end or middle of a page, which is not desired
+                startIndex = Math.Clamp(startIndex, 0, (totalPages * numItems) - numItems);
                 currentPage = Math.Clamp(currentPage, 1, totalPages);
             }
         }
 
+        /// <summary>
+        /// Prompt the user for a search term and let the manager find the matches.
+        /// </summary>
         public void Search()
         {
             string searchTerm = Utils.GetNonEmptyStringInput("search for: ");

@@ -22,7 +22,7 @@ namespace Assignment1
             commandParser.Add("complete", actionManager.Complete);
             commandParser.Add("list",     actionManager.List);
             commandParser.Add("search",   actionManager.Search);
-            commandParser.Add("help",     commandParser.Help); //actionManager.PrintHelp);
+            commandParser.Add("help",     commandParser.Help);
             commandParser.Add("clear",    Console.Clear);
 
             // before running the REPL, print the help message

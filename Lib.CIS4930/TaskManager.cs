@@ -26,7 +26,7 @@ namespace Library.Assignment1
         }
 
         /// <summary>
-        /// How to display the list, either showing all items or only
+        /// How to display the list of ToDos, either showing all items or only
         /// incomplete ones.
         /// </summary>
         public enum TodoFilterMode
@@ -35,6 +35,9 @@ namespace Library.Assignment1
             NotComplete
         }
 
+        /// <summary>
+        /// How to display the list, either only ToDos, only appointments, or both.
+        /// </summary>
         public enum ListMode
         {
             TodosOnly,
@@ -42,6 +45,9 @@ namespace Library.Assignment1
             Both
         }
 
+        /// <summary>
+        /// Represents the possible Task types, either ToDo or Appointment
+        /// </summary>
         public enum TaskType
         { 
             ToDo,
@@ -53,15 +59,27 @@ namespace Library.Assignment1
         /// </summary>
         public int Count { get => _tasks.Count; }
 
+        /// <summary>
+        /// Returns the number of Tasks of type ToDo
+        /// </summary>
         public int TodosCount { get => _tasks.Where(t => t is ToDo).Count(); }
 
+        /// <summary>
+        /// Returns the number of Tasks of type Appointment
+        /// </summary>
         public int AppointmentsCount { get => _tasks.Where(t => t is Appointment).Count(); }
 
-
+        // the internally managed list of tasks
         private List<ITask> _tasks;
+
+        // the object to save and load the task data
         private BinaryFormatter _serializer;
 
+        // the file name for the save data
         private const string SAVEFILE = "tasks.bin";
+
+        // defines the type of a function to call within the for loop of the List function
+        private delegate bool ListCondition(int index, int displayed, int startIndex, int numTasks, int taskCount);
 
         public TaskManager()
         {
@@ -69,6 +87,11 @@ namespace Library.Assignment1
             Load();
         }
 
+        /// <summary>
+        /// Get the type of the Task at the given index
+        /// </summary>
+        /// <param name="index">The index of the Task to check</param>
+        /// <returns>the type of the Task at that index, either ToDo or Appointment</returns>
         public TaskType TypeOf(int index)
         {
             var task = _tasks[index];
@@ -80,17 +103,25 @@ namespace Library.Assignment1
         }
 
         /// <summary>
-        /// Create a new Task that this manager will track.
+        /// Create a new ToDo that this manager will track.
         /// </summary>
-        /// <param name="name">the display name of the task</param>
-        /// <param name="description">a brief description of the task</param>
-        /// <param name="deadline">when the task is due, in a valid DateTime</param>
+        /// <param name="name">the display name of the ToDo</param>
+        /// <param name="description">a brief description of the ToDo</param>
+        /// <param name="deadline">when the ToDo is due</param>
         public void Create(string name, string description, DateTime deadline)
         {
             _tasks.Add(new ToDo(name, description, deadline));
             Save();
         }
 
+        /// <summary>
+        /// Create a new Appointment that this manager will track.
+        /// </summary>
+        /// <param name="name">the display name of the Appointment</param>
+        /// <param name="description">a brief description of the Appointment</param>
+        /// <param name="start">when the Appointment starts</param>
+        /// <param name="end">when the Appointment ends</param>
+        /// <param name="attendees">a list of the other attendees</param>
         public void Create(string name, string description, DateTime start, DateTime end, IEnumerable<string> attendees)
         {
             _tasks.Add(new Appointment(name, description, start, end, attendees.ToList()));
@@ -189,6 +220,11 @@ namespace Library.Assignment1
             Save();
         }
 
+        /// <summary>
+        /// Update the start date of the Task at the given index.
+        /// </summary>
+        /// <param name="index">the index of the Task to update</param>
+        /// <param name="newStart">the new start value for this Task</param>
         public void EditStart(int index, DateTime newStart)
         {
             // if outside the bounds, return without doing anything
@@ -205,6 +241,11 @@ namespace Library.Assignment1
             Save();
         }
 
+        /// <summary>
+        /// Update the end date of the Task at the given index.
+        /// </summary>
+        /// <param name="index">the index of the Task to update</param>
+        /// <param name="newEnd">the new end value for this Task</param>
         public void EditEnd(int index, DateTime newEnd)
         {
             // if outside the bounds, return without doing anything
@@ -221,6 +262,11 @@ namespace Library.Assignment1
             Save();
         }
 
+        /// <summary>
+        /// Update the attendees of the Task at the given index.
+        /// </summary>
+        /// <param name="index">the index of the Task to update</param>
+        /// <param name="newAttendees">the new attendees value for this Task</param>
         public void EditAttendees(int index, IEnumerable<string> newAttendees)
         {
             // if outside the bounds, return without doing anything
@@ -257,24 +303,16 @@ namespace Library.Assignment1
             Save();
         }
 
-        private delegate bool ListCondition(int index, int displayed, int startIndex, int numTasks, int taskCount);
-
-        private bool OnlyCondition(int index, int displayed, int startIndex, int numTasks, int taskCount)
-        {
-            return index < taskCount && displayed < numTasks;
-        }
-
-        private bool BothCondition(int index, int displayed, int startIndex, int numTasks, int taskCount)
-        {
-            return index < taskCount && index < startIndex + numTasks;
-        }
-
         /// <summary>
-        /// Print the list of Tasks to the console, dictated by the given mode
+        /// Print the page of ToDos to the console, dictated by the given mode
         /// </summary>
-        /// <param name="filter">what Tasks to show, either all of them or only incomplete ones</param>
+        /// <param name="mode">whether we are in ToDos only or Both mode</param>
+        /// <param name="filter">whether to show incomplete or all ToDos</param>
+        /// <param name="startIndex">the starting index for the page</param>
+        /// <param name="numTasks">the number of tasks to show per page</param>
         public void ListToDos(ListMode mode, TodoFilterMode filter, int startIndex, int numTasks)
         {
+            // choose which for loop condition we will use based on the list mode
             ListCondition condition = mode switch
             {
                 ListMode.TodosOnly => OnlyCondition,
@@ -284,8 +322,8 @@ namespace Library.Assignment1
             int displayed = 0;
             for (int i = startIndex; condition(i, displayed, startIndex, numTasks, _tasks.Count); i++ )
             {
+                // get the task and coerce it into a ToDo if possible
                 var task = _tasks[i];
-
                 if (task is not ToDo)
                     continue;
 
@@ -299,13 +337,18 @@ namespace Library.Assignment1
             }
 
             if (displayed == 0)
-            {
                 Console.WriteLine("Nothing to do for now!");
-            }
         }
 
+        /// <summary>
+        /// Print the page of Appointments to the console, dictated by the given mode
+        /// </summary>
+        /// <param name="mode">whether we are in Appointments only or Both mode</param>
+        /// <param name="startIndex">the starting index for the page</param>
+        /// <param name="numTasks">the number of tasks to show per page</param>
         public void ListAppointments(ListMode mode, int startIndex, int numTasks)
         {
+            // choose which for loop condition we will use based on the list mode
             ListCondition condition = mode switch
             {
                 ListMode.AppointmentsOnly => OnlyCondition,
@@ -315,8 +358,8 @@ namespace Library.Assignment1
             int displayed = 0;
             for (int i = startIndex; condition(i, displayed, startIndex, numTasks, _tasks.Count); i++)
             {
+                // only print this task if it is an appointment
                 var task = _tasks[i];
-
                 if (task is not Appointment)
                     continue;
 
@@ -325,26 +368,30 @@ namespace Library.Assignment1
             }
 
             if (displayed == 0)
-            {
                 Console.WriteLine("No appointments for now!");
-            }
         }
 
+        /// <summary>
+        /// Search all possible data fields of every Task for the search term and print the results
+        /// </summary>
+        /// <param name="searchTerm">the substring to check each field for</param>
         public void Search(string searchTerm)
         {
-            searchTerm = searchTerm.ToLower();
+            // we will do all comparisons ignoring case, so this just reduces having to retype the whole
+            // thing on every comparison
             var ignoreCase = StringComparison.OrdinalIgnoreCase;
 
-            List<ITask> results = new List<ITask>();
-
+            var results = new List<ITask>();
             foreach (var task in _tasks)
             {
+                // check both the name and description first
                 if (task.Name.Contains(searchTerm, ignoreCase) || task.Description.Contains(searchTerm, ignoreCase)) 
                 { 
                     results.Add(task);
                     continue;
                 }
 
+                // check the special data fields of a ToDo
                 if (task is ToDo todo)
                 {
                     if (todo.Deadline.ToLongDateString().Contains(searchTerm, ignoreCase)) 
@@ -353,6 +400,7 @@ namespace Library.Assignment1
                         continue;
                     }
                 }    
+                // check the special data fields of an Appointment
                 else if (task is Appointment appt)
                 {
                     if (appt.Start.ToLongDateString().Contains(searchTerm, ignoreCase))
@@ -378,6 +426,9 @@ namespace Library.Assignment1
                 }
             }
 
+            // we do a separate for loop over the entire list of tasks so that we can preserve the correct
+            // index for each task in the output; slightly inefficient, but the best way I could think
+            // of to easily preserve this information
             for (int i = 0; i < _tasks.Count; i++)
             {
                 var task = _tasks[i];
@@ -389,6 +440,9 @@ namespace Library.Assignment1
             }
         }
 
+        /// <summary>
+        /// Save the _tasks list to a binary file.
+        /// </summary>
         private void Save()
         {
             var file = File.OpenWrite(SAVEFILE);
@@ -402,6 +456,10 @@ namespace Library.Assignment1
             */
         }
 
+        /// <summary>
+        /// Load the binary file and initialize the _tasks list with its data if possible; otherwise
+        /// set _tasks to an empty list.
+        /// </summary>
         private void Load()
         {
             if (File.Exists(SAVEFILE))
@@ -423,9 +481,39 @@ namespace Library.Assignment1
                 */
             }
             else
-            {
                 _tasks = new List<ITask>();
-            }
+        }
+
+        /// <summary>
+        /// The for loop condition when the list is in ToDo or Appointment only mode
+        /// </summary>
+        /// <param name="index">current index of the for loop</param>
+        /// <param name="displayed">the number of tasks that have been displayed</param>
+        /// <param name="startIndex">the starting index of the current page</param>
+        /// <param name="numTasks">the desired number of tasks to display on this page</param>
+        /// <param name="taskCount">the overall size of the _tasks array</param>
+        /// <returns>true if the foor loop should continue, false otherwise</returns>
+        private bool OnlyCondition(int index, int displayed, int startIndex, int numTasks, int taskCount)
+        {
+            // continue if we have not reached the end of the list and we have not already displayed
+            // the maximum number of tasks per page
+            return index < taskCount && displayed < numTasks;
+        }
+
+        /// <summary>
+        /// The for loop condition when the list is in Both mode
+        /// </summary>
+        /// <param name="index">current index of the for loop</param>
+        /// <param name="displayed">the number of tasks that have been displayed</param>
+        /// <param name="startIndex">the starting index of the current page</param>
+        /// <param name="numTasks">the desired number of tasks to display on this page</param>
+        /// <param name="taskCount">the overall size of the _tasks array</param>
+        /// <returns>true if the foor loop should continue, false otherwise</returns>
+        private bool BothCondition(int index, int displayed, int startIndex, int numTasks, int taskCount)
+        {
+            // continue if we have not reached the end of the list and the current index is within the list of
+            // indices for this page
+            return index < taskCount && index < startIndex + numTasks;
         }
     }
 }

@@ -58,6 +58,11 @@ namespace CIS4930_Assignment1
             }
         }
 
+        /// <summary>
+        /// Prompt the user until they enter a valid integer.
+        /// </summary>
+        /// <param name="prompt">The message to prompt the user with.</param>
+        /// <returns>the integer that was read in</returns>
         public static int GetValidInteger(string prompt)
         {
             while (true)
@@ -80,6 +85,11 @@ namespace CIS4930_Assignment1
             }
         }
 
+        /// <summary>
+        /// Prompt the user until they enter a valid DateTime
+        /// </summary>
+        /// <param name="prompt">The message to prompt the user with.</param>
+        /// <returns>the DateTime that was read in</returns>
         public static DateTime GetValidDate(string prompt)
         {
             DateTime date;
@@ -87,7 +97,7 @@ namespace CIS4930_Assignment1
             while (true)
             {
                 // first, wait until a non-empty string is given
-                string dateIn = Utils.GetNonEmptyStringInput(prompt);
+                string dateIn = GetNonEmptyStringInput(prompt);
 
                 // then, make sure the given string is a valid date. if not, repeat the whole process
                 try
@@ -104,30 +114,10 @@ namespace CIS4930_Assignment1
             }
         }
 
-        public static bool GetValidBool(string prompt)
-        {
-            bool val;
-
-            while (true)
-            {
-                // first, wait until a non-empty string is given
-                string input = GetNonEmptyStringInput(prompt);
-
-                // then, make sure the given string is a valid date. if not, repeat the whole process
-                try
-                {
-                    val = bool.Parse(input);
-                }
-                catch (FormatException)
-                {
-                    PrintRed("Invalid boolean entered. Please try again.");
-                    continue;
-                }
-
-                return val;
-            }
-        }
-
+        /// <summary>
+        /// Get the type of the desired task, either ToDo or Appointment
+        /// </summary>
+        /// <returns>the enum value of TaskType representing the desired type</returns>
         public static TaskType GetTaskType()
         {
             while (true)
@@ -143,6 +133,10 @@ namespace CIS4930_Assignment1
             }
         }
 
+        /// <summary>
+        /// Print the given object to the console with a blue foreground
+        /// </summary>
+        /// <param name="val">the object whose ToString will be printed</param>
         public static void PrintBlue(object val)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
@@ -150,6 +144,10 @@ namespace CIS4930_Assignment1
             Console.ResetColor();
         }
 
+        /// <summary>
+        /// Print the given object to the console with a green foreground
+        /// </summary>
+        /// <param name="val">the object whose ToString will be printed</param>
         public static void PrintGreen(object val)
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -157,6 +155,10 @@ namespace CIS4930_Assignment1
             Console.ResetColor();
         }
 
+        /// <summary>
+        /// Print the given object to the console with a red foreground
+        /// </summary>
+        /// <param name="val">the object whose ToString will be printed</param>
         public static void PrintRed(object val)
         {
             Console.ForegroundColor = ConsoleColor.Red;
