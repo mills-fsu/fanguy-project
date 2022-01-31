@@ -342,6 +342,8 @@ namespace CIS4930_Assignment1
             // each page has 5 items, so divide the count by 5; we must use the ceiling
             // since any decimal indicates some overflow and thus a new, partially-filled page
             int totalPages = (int) Math.Ceiling(maxCount / 5.0f);
+            if (totalPages == 0)
+                totalPages = 1;
             // start off at the first page
             int currentPage = 1;
 

@@ -72,18 +72,23 @@ namespace Library.Assignment1
         // the internally managed list of tasks
         private List<ITask> _tasks;
 
-        // the object to save and load the task data
-        private BinaryFormatter _serializer;
-
         // the file name for the save data
-        private const string SAVEFILE = "tasks.bin";
+        private string _saveFile;
+
+        // the settings to use in the JSON conversion
+        private JsonSerializerSettings _serializerSettings;
 
         // defines the type of a function to call within the for loop of the List function
         private delegate bool ListCondition(int index, int displayed, int startIndex, int numTasks, int taskCount);
 
         public TaskManager()
         {
-            _serializer = new BinaryFormatter();
+            _saveFile = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "tasks.json");
+            _serializerSettings = new JsonSerializerSettings()
+            {
+                TypeNameHandling = TypeNameHandling.All,
+            };
+
             Load();
         }
 
@@ -441,44 +446,24 @@ namespace Library.Assignment1
         }
 
         /// <summary>
-        /// Save the _tasks list to a binary file.
+        /// Save the _tasks list to a JSON file.
         /// </summary>
         private void Save()
         {
-            var file = File.OpenWrite(SAVEFILE);
-            _serializer.Serialize(file, _tasks);
-            file.Close();
-
-            /*
-            string fileName = "TEST.json";
-            string jsonString = JsonConvert.SerializeObject(_tasks); //JsonSerializer.Serialize(_tasks);
-            File.WriteAllText(fileName, jsonString);
-            */
+            var jsonString = JsonConvert.SerializeObject(_tasks, _serializerSettings);
+            File.WriteAllText(_saveFile, jsonString);
         }
 
         /// <summary>
-        /// Load the binary file and initialize the _tasks list with its data if possible; otherwise
+        /// Load the JSON file and initialize the _tasks list with its data if possible; otherwise
         /// set _tasks to an empty list.
         /// </summary>
         private void Load()
         {
-            if (File.Exists(SAVEFILE))
+            if (File.Exists(_saveFile))
             {
-                var file = File.OpenRead(SAVEFILE);
-                _tasks = (List<ITask>)_serializer.Deserialize(file);
-                file.Close();
-
-                /*
-                string fileName = "TEST.json";
-                string jsonString = File.ReadAllText(fileName);
-                var tasks = JsonConvert.DeserializeObject<List<ITask>>(jsonString, new JsonSerializerSettings()
-                {
-                    TypeNameHandling = TypeNameHandling.All,
-                });
-
-                foreach (var task in tasks)
-                    Console.WriteLine(task);
-                */
+                var jsonString = File.ReadAllText(_saveFile);
+                _tasks = JsonConvert.DeserializeObject<List<ITask>>(jsonString, _serializerSettings) ?? new List<ITask>();
             }
             else
                 _tasks = new List<ITask>();
