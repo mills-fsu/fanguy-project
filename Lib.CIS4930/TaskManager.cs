@@ -2,6 +2,7 @@
 using System.Runtime.Serialization.Formatters.Binary;
 using Newtonsoft.Json;
 using System.Text.Json;
+using Lib.CIS4930.Services;
 
 namespace Library.Assignment1
 {
@@ -57,39 +58,27 @@ namespace Library.Assignment1
         /// <summary>
         /// Returns the number of current tasks, both complete and incomplete.
         /// </summary>
-        public int Count { get => _tasks.Count; }
+        public int Count { get => _taskService.Tasks.Count; }
 
         /// <summary>
         /// Returns the number of Tasks of type ToDo
         /// </summary>
-        public int TodosCount { get => _tasks.Where(t => t is ToDo).Count(); }
+        public int TodosCount { get => _taskService.Tasks.Where(t => t is ToDo).Count(); }
 
         /// <summary>
         /// Returns the number of Tasks of type Appointment
         /// </summary>
-        public int AppointmentsCount { get => _tasks.Where(t => t is Appointment).Count(); }
+        public int AppointmentsCount { get => _taskService.Tasks.Where(t => t is Appointment).Count(); }
 
         // the internally managed list of tasks
-        private List<ITask> _tasks;
-
-        // the file name for the save data
-        private string _saveFile;
-
-        // the settings to use in the JSON conversion
-        private JsonSerializerSettings _serializerSettings;
+        private ITaskService _taskService;
 
         // defines the type of a function to call within the for loop of the List function
         private delegate bool ListCondition(int index, int displayed, int startIndex, int numTasks, int taskCount);
 
         public TaskManager()
         {
-            _saveFile = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "tasks.json");
-            _serializerSettings = new JsonSerializerSettings()
-            {
-                TypeNameHandling = TypeNameHandling.All,
-            };
-
-            Load();
+             _taskService = LocalTaskService.Instance;
         }
 
         /// <summary>
@@ -99,7 +88,7 @@ namespace Library.Assignment1
         /// <returns>the type of the Task at that index, either ToDo or Appointment</returns>
         public TaskType TypeOf(int index)
         {
-            var task = _tasks[index];
+            var task = _taskService.Tasks[index];
 
             if (task is ToDo)
                 return TaskType.ToDo;
@@ -115,8 +104,8 @@ namespace Library.Assignment1
         /// <param name="deadline">when the ToDo is due</param>
         public void Create(string name, string description, DateTime deadline)
         {
-            _tasks.Add(new ToDo(name, description, deadline));
-            Save();
+            _taskService.Tasks.Add(new ToDo(name, description, deadline));
+            _taskService.Save();
         }
 
         /// <summary>
@@ -129,8 +118,8 @@ namespace Library.Assignment1
         /// <param name="attendees">a list of the other attendees</param>
         public void Create(string name, string description, DateTime start, DateTime end, IEnumerable<string> attendees)
         {
-            _tasks.Add(new Appointment(name, description, start, end, attendees.ToList()));
-            Save();
+            _taskService.Tasks.Add(new Appointment(name, description, start, end, attendees.ToList()));
+            _taskService.Save();
         }
 
         /// <summary>
@@ -140,13 +129,13 @@ namespace Library.Assignment1
         public void Delete(int index)
         {
             // if outside the bounds, return without doing anything
-            if (index < 0 || index >= _tasks.Count)
+            if (index < 0 || index >= _taskService.Tasks.Count)
             {
                 return;
             }
 
-            _tasks.RemoveAt(index);
-            Save();
+            _taskService.Tasks.RemoveAt(index);
+            _taskService.Save();
         }
 
         /// <summary>
@@ -157,13 +146,13 @@ namespace Library.Assignment1
         public void EditName(int index, string newName)
         {
             // if outside the bounds, return without doing anything
-            if (index < 0 || index >= _tasks.Count)
+            if (index < 0 || index >= _taskService.Tasks.Count)
             {
                 return;
             }
 
-            _tasks[index].Name = newName;
-            Save();
+            _taskService.Tasks[index].Name = newName;
+            _taskService.Save();
         }
 
         /// <summary>
@@ -174,13 +163,13 @@ namespace Library.Assignment1
         public void EditDescription(int index, string newDescription)
         {
             // if outside the bounds, return without doing anything
-            if (index < 0 || index >= _tasks.Count)
+            if (index < 0 || index >= _taskService.Tasks.Count)
             {
                 return;
             }
 
-            _tasks[index].Description = newDescription;
-            Save();
+            _taskService.Tasks[index].Description = newDescription;
+            _taskService.Save();
         }
 
         /// <summary>
@@ -191,17 +180,17 @@ namespace Library.Assignment1
         public void EditDeadline(int index, DateTime newDeadline)
         {
             // if outside the bounds, return without doing anything
-            if (index < 0 || index >= _tasks.Count)
+            if (index < 0 || index >= _taskService.Tasks.Count)
             {
                 return;
             }
 
-            var task = _tasks[index];
+            var task = _taskService.Tasks[index];
 
             if (task is ToDo todo)
                 todo.Deadline = newDeadline;
 
-            Save();
+            _taskService.Save();
         }
 
         /// <summary>
@@ -212,17 +201,17 @@ namespace Library.Assignment1
         public void EditIsCompleted(int index, bool newIsCompleted)
         {
             // if outside the bounds, return without doing anything
-            if (index < 0 || index >= _tasks.Count)
+            if (index < 0 || index >= _taskService.Tasks.Count)
             {
                 return;
             }
 
-            var task = _tasks[index];
+            var task = _taskService.Tasks[index];
 
             if (task is ToDo todo)
                 todo.IsCompleted = newIsCompleted;
 
-            Save();
+            _taskService.Save();
         }
 
         /// <summary>
@@ -233,17 +222,17 @@ namespace Library.Assignment1
         public void EditStart(int index, DateTime newStart)
         {
             // if outside the bounds, return without doing anything
-            if (index < 0 || index >= _tasks.Count)
+            if (index < 0 || index >= _taskService.Tasks.Count)
             {
                 return;
             }
 
-            var task = _tasks[index];
+            var task = _taskService.Tasks[index];
 
             if (task is Appointment appt)
                 appt.Start = newStart;
 
-            Save();
+            _taskService.Save();
         }
 
         /// <summary>
@@ -254,17 +243,17 @@ namespace Library.Assignment1
         public void EditEnd(int index, DateTime newEnd)
         {
             // if outside the bounds, return without doing anything
-            if (index < 0 || index >= _tasks.Count)
+            if (index < 0 || index >= _taskService.Tasks.Count)
             {
                 return;
             }
 
-            var task = _tasks[index];
+            var task = _taskService.Tasks[index];
 
             if (task is Appointment appt)
                 appt.Start = newEnd;
 
-            Save();
+            _taskService.Save();
         }
 
         /// <summary>
@@ -275,17 +264,17 @@ namespace Library.Assignment1
         public void EditAttendees(int index, IEnumerable<string> newAttendees)
         {
             // if outside the bounds, return without doing anything
-            if (index < 0 || index >= _tasks.Count)
+            if (index < 0 || index >= _taskService.Tasks.Count)
             {
                 return;
             }
 
-            var task = _tasks[index];
+            var task = _taskService.Tasks[index];
 
             if (task is Appointment appt)
                 appt.Attendees = newAttendees.ToList();
 
-            Save();
+            _taskService.Save();
         }
 
         /// <summary>
@@ -295,17 +284,17 @@ namespace Library.Assignment1
         public void Complete(int index)
         {
             // if outside the bounds, return without doing anything
-            if (index < 0 || index >= _tasks.Count)
+            if (index < 0 || index >= _taskService.Tasks.Count)
             {
                 return;
             }
 
-            var task = _tasks[index];
+            var task = _taskService.Tasks[index];
 
             if (task is ToDo todo)
                 todo.IsCompleted = true;
 
-            Save();
+            _taskService.Save();
         }
 
         /// <summary>
@@ -325,10 +314,10 @@ namespace Library.Assignment1
             };
 
             int displayed = 0;
-            for (int i = startIndex; condition(i, displayed, startIndex, numTasks, _tasks.Count); i++ )
+            for (int i = startIndex; condition(i, displayed, startIndex, numTasks, _taskService.Tasks.Count); i++ )
             {
                 // get the task and coerce it into a ToDo if possible
-                var task = _tasks[i];
+                var task = _taskService.Tasks[i];
                 if (task is not ToDo)
                     continue;
 
@@ -361,10 +350,10 @@ namespace Library.Assignment1
             };
 
             int displayed = 0;
-            for (int i = startIndex; condition(i, displayed, startIndex, numTasks, _tasks.Count); i++)
+            for (int i = startIndex; condition(i, displayed, startIndex, numTasks, _taskService.Tasks.Count); i++)
             {
                 // only print this task if it is an appointment
-                var task = _tasks[i];
+                var task = _taskService.Tasks[i];
                 if (task is not Appointment)
                     continue;
 
@@ -387,7 +376,7 @@ namespace Library.Assignment1
             var ignoreCase = StringComparison.OrdinalIgnoreCase;
 
             var results = new List<ITask>();
-            foreach (var task in _tasks)
+            foreach (var task in _taskService.Tasks)
             {
                 // check both the name and description first
                 if (task.Name.Contains(searchTerm, ignoreCase) || task.Description.Contains(searchTerm, ignoreCase)) 
@@ -434,9 +423,9 @@ namespace Library.Assignment1
             // we do a separate for loop over the entire list of tasks so that we can preserve the correct
             // index for each task in the output; slightly inefficient, but the best way I could think
             // of to easily preserve this information
-            for (int i = 0; i < _tasks.Count; i++)
+            for (int i = 0; i < _taskService.Tasks.Count; i++)
             {
-                var task = _tasks[i];
+                var task = _taskService.Tasks[i];
 
                 if (results.Contains(task))
                 {
@@ -446,37 +435,13 @@ namespace Library.Assignment1
         }
 
         /// <summary>
-        /// Save the _tasks list to a JSON file.
-        /// </summary>
-        private void Save()
-        {
-            var jsonString = JsonConvert.SerializeObject(_tasks, _serializerSettings);
-            File.WriteAllText(_saveFile, jsonString);
-        }
-
-        /// <summary>
-        /// Load the JSON file and initialize the _tasks list with its data if possible; otherwise
-        /// set _tasks to an empty list.
-        /// </summary>
-        private void Load()
-        {
-            if (File.Exists(_saveFile))
-            {
-                var jsonString = File.ReadAllText(_saveFile);
-                _tasks = JsonConvert.DeserializeObject<List<ITask>>(jsonString, _serializerSettings) ?? new List<ITask>();
-            }
-            else
-                _tasks = new List<ITask>();
-        }
-
-        /// <summary>
         /// The for loop condition when the list is in ToDo or Appointment only mode
         /// </summary>
         /// <param name="index">current index of the for loop</param>
         /// <param name="displayed">the number of tasks that have been displayed</param>
         /// <param name="startIndex">the starting index of the current page</param>
         /// <param name="numTasks">the desired number of tasks to display on this page</param>
-        /// <param name="taskCount">the overall size of the _tasks array</param>
+        /// <param name="taskCount">the overall size of the _taskService.Tasks array</param>
         /// <returns>true if the foor loop should continue, false otherwise</returns>
         private bool OnlyCondition(int index, int displayed, int startIndex, int numTasks, int taskCount)
         {
@@ -492,7 +457,7 @@ namespace Library.Assignment1
         /// <param name="displayed">the number of tasks that have been displayed</param>
         /// <param name="startIndex">the starting index of the current page</param>
         /// <param name="numTasks">the desired number of tasks to display on this page</param>
-        /// <param name="taskCount">the overall size of the _tasks array</param>
+        /// <param name="taskCount">the overall size of the _taskService.Tasks array</param>
         /// <returns>true if the foor loop should continue, false otherwise</returns>
         private bool BothCondition(int index, int displayed, int startIndex, int numTasks, int taskCount)
         {
