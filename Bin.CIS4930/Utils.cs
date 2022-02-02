@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Library.Assignment1.TaskManager;
+﻿using static Lib.CIS4930.TaskManager;
 
-namespace CIS4930_Assignment1
+namespace Bin.CIS4930
 {
     public static class Utils
     {

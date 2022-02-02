@@ -1,10 +1,7 @@
-﻿using Lib.CIS4930;
-using System.Runtime.Serialization.Formatters.Binary;
-using Newtonsoft.Json;
-using System.Text.Json;
-using Lib.CIS4930.Services;
+﻿using Lib.CIS4930.Services;
+using Lib.CIS4930.Models;
 
-namespace Library.Assignment1
+namespace Lib.CIS4930
 {
     public class TaskManager
     {

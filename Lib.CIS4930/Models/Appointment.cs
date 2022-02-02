@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Lib.CIS4930
+﻿namespace Lib.CIS4930.Models
 {
     [Serializable]
     public class Appointment : ITask

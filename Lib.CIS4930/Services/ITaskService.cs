@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Lib.CIS4930.Models;
 
 namespace Lib.CIS4930
 {
     internal interface ITaskService
     {
         public static ITaskService Instance { get; }
-        public IList<ITask> Tasks { get; }
+        public List<ITask> Tasks { get; }
 
         public void Save();
 

@@ -1,11 +1,4 @@
-﻿using Lib.CIS4930;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Library.Assignment1
+﻿namespace Lib.CIS4930.Models
 {
     [Serializable]
     public class ToDo : ITask

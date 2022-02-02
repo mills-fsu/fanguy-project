@@ -1,9 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Lib.CIS4930.Models;
+using Newtonsoft.Json;
 
 namespace Lib.CIS4930.Services
 {
@@ -27,7 +23,7 @@ namespace Lib.CIS4930.Services
         /// <summary>
         /// The list of ITasks to be managed by the application.
         /// </summary>
-        public IList<ITask> Tasks { get; private set; }
+        public List<ITask> Tasks { get; private set; }
 
         // the file name for the save data
         private string _saveFile;
