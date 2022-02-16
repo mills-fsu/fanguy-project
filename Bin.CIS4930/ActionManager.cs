@@ -1,4 +1,5 @@
 ﻿using Lib.CIS4930;
+using Lib.CIS4930.Models;
 using static Lib.CIS4930.TaskManager;
 
 namespace Bin.CIS4930
@@ -321,6 +322,34 @@ namespace Bin.CIS4930
                 }
             }
 
+            Paging(mode, todoFilter);
+        }
+
+        /// <summary>
+        /// Prompt the user for a search term and let the manager find the matches.
+        /// </summary>
+        public void Search()
+        {
+            string searchTerm = Utils.GetNonEmptyStringInput("search for: ");
+
+            Console.WriteLine("\nResults");
+            Console.WriteLine("---------------");
+
+            var results = _manager.Search(searchTerm);
+
+            Paging(ListMode.Both, TodoFilterMode.All, results);
+        }
+
+        /// <summary>
+        /// Print a message saying the given command was not recognized.
+        /// </summary>
+        public void UnrecognizedCommand()
+        {
+            Utils.PrintRed("\nThat command was not recognized. Please try again.\n");
+        }
+
+        private void Paging(ListMode mode, TodoFilterMode todoFilter, List<ITask>? list = null)
+        {
             // the index to start the page at
             int startIndex = 0;
             // how many items to show on the page
@@ -328,15 +357,24 @@ namespace Bin.CIS4930
             // the count of applicable objects, depending on the list's mode
             // if we are only showing one type or the other, only get the count of those objects
             // instead of the whole _tasks list count
-            var maxCount = mode switch
+            int maxCount;
+            if (list == null)
             {
-                ListMode.TodosOnly        => _manager.TodosCount,
-                ListMode.AppointmentsOnly => _manager.AppointmentsCount,
-                _                         => _manager.Count,
-            };
+                maxCount = mode switch
+                {
+                    ListMode.TodosOnly => _manager.TodosCount,
+                    ListMode.AppointmentsOnly => _manager.AppointmentsCount,
+                    _ => _manager.Count,
+                };
+            }
+            else
+            {
+                maxCount = list.Count;
+            }
+
             // each page has 5 items, so divide the count by 5; we must use the ceiling
             // since any decimal indicates some overflow and thus a new, partially-filled page
-            int totalPages = (int) Math.Ceiling(maxCount / 5.0f);
+            int totalPages = (int)Math.Ceiling(maxCount / 5.0f);
             if (totalPages == 0)
                 totalPages = 1;
             // start off at the first page
@@ -347,19 +385,19 @@ namespace Bin.CIS4930
                 Console.WriteLine("q to finish, arrow keys to navigate");
                 Console.WriteLine($"page {currentPage}/{totalPages}");
 
-                Console.WriteLine("\nYour Tasks");
+                Console.WriteLine("\nTasks");
                 Console.WriteLine("---------------");
 
                 if (mode == ListMode.TodosOnly || mode == ListMode.Both)
                 {
                     Console.WriteLine("ToDos:");
-                    _manager.ListToDos(mode, todoFilter, startIndex, numItems);
+                    _manager.ListToDos(mode, todoFilter, startIndex, numItems, list);
                 }
 
                 if (mode == ListMode.AppointmentsOnly || mode == ListMode.Both)
                 {
                     Console.WriteLine("\nAppointments:");
-                    _manager.ListAppointments(mode, startIndex, numItems);
+                    _manager.ListAppointments(mode, startIndex, numItems, list);
                 }
 
                 // wait until the user enters a key
@@ -390,27 +428,6 @@ namespace Bin.CIS4930
                 startIndex = Math.Clamp(startIndex, 0, (totalPages * numItems) - numItems);
                 currentPage = Math.Clamp(currentPage, 1, totalPages);
             }
-        }
-
-        /// <summary>
-        /// Prompt the user for a search term and let the manager find the matches.
-        /// </summary>
-        public void Search()
-        {
-            string searchTerm = Utils.GetNonEmptyStringInput("search for: ");
-
-            Console.WriteLine("\nResults");
-            Console.WriteLine("---------------");
-
-            _manager.Search(searchTerm);
-        }
-
-        /// <summary>
-        /// Print a message saying the given command was not recognized.
-        /// </summary>
-        public void UnrecognizedCommand()
-        {
-            Utils.PrintRed("\nThat command was not recognized. Please try again.\n");
         }
     }
 }

@@ -301,8 +301,11 @@ namespace Lib.CIS4930
         /// <param name="filter">whether to show incomplete or all ToDos</param>
         /// <param name="startIndex">the starting index for the page</param>
         /// <param name="numTasks">the number of tasks to show per page</param>
-        public void ListToDos(ListMode mode, TodoFilterMode filter, int startIndex, int numTasks)
+        public void ListToDos(ListMode mode, TodoFilterMode filter, int startIndex, int numTasks, List<ITask>? list = null)
         {
+            if (list == null)
+                list = _taskService.Tasks;
+
             // choose which for loop condition we will use based on the list mode
             ListCondition condition = mode switch
             {
@@ -311,10 +314,10 @@ namespace Lib.CIS4930
             };
 
             int displayed = 0;
-            for (int i = startIndex; condition(i, displayed, startIndex, numTasks, _taskService.Tasks.Count); i++ )
+            for (int i = startIndex; condition(i, displayed, startIndex, numTasks, list.Count); i++ )
             {
                 // get the task and coerce it into a ToDo if possible
-                var task = _taskService.Tasks[i];
+                var task = list[i];
                 if (task is not ToDo)
                     continue;
 
@@ -337,8 +340,11 @@ namespace Lib.CIS4930
         /// <param name="mode">whether we are in Appointments only or Both mode</param>
         /// <param name="startIndex">the starting index for the page</param>
         /// <param name="numTasks">the number of tasks to show per page</param>
-        public void ListAppointments(ListMode mode, int startIndex, int numTasks)
+        public void ListAppointments(ListMode mode, int startIndex, int numTasks, List<ITask>? list = null)
         {
+            if (list == null)
+                list = _taskService.Tasks;
+
             // choose which for loop condition we will use based on the list mode
             ListCondition condition = mode switch
             {
@@ -347,10 +353,10 @@ namespace Lib.CIS4930
             };
 
             int displayed = 0;
-            for (int i = startIndex; condition(i, displayed, startIndex, numTasks, _taskService.Tasks.Count); i++)
+            for (int i = startIndex; condition(i, displayed, startIndex, numTasks, list.Count); i++)
             {
                 // only print this task if it is an appointment
-                var task = _taskService.Tasks[i];
+                var task = list[i];
                 if (task is not Appointment)
                     continue;
 
@@ -366,7 +372,7 @@ namespace Lib.CIS4930
         /// Search all possible data fields of every Task for the search term and print the results
         /// </summary>
         /// <param name="searchTerm">the substring to check each field for</param>
-        public void Search(string searchTerm)
+        public List<ITask> Search(string searchTerm)
         {
             // we will do all comparisons ignoring case, so this just reduces having to retype the whole
             // thing on every comparison
@@ -416,6 +422,8 @@ namespace Lib.CIS4930
                     }
                 }
             }
+
+            return results;
 
             // we do a separate for loop over the entire list of tasks so that we can preserve the correct
             // index for each task in the output; slightly inefficient, but the best way I could think
