@@ -1,7 +1,11 @@
-﻿using Lib.CIS4930.Models;
+﻿using Lib.CIS4930.Standard.Models;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
 
-namespace Lib.CIS4930.Services
+namespace Lib.CIS4930.Standard.Services
 {
     public class LocalTaskService : ITaskService
     {
@@ -12,7 +16,8 @@ namespace Lib.CIS4930.Services
         /// </summary>
         public static ITaskService Instance
         {
-            get {
+            get
+            {
                 if (_instance == null)
                     _instance = new LocalTaskService();
 
@@ -34,12 +39,12 @@ namespace Lib.CIS4930.Services
         private LocalTaskService()
         {
             // create the save directory if it does not exist yet
-            var saveDir = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CIS4930");
+            var saveDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CIS4930");
             if (!File.Exists(saveDir))
                 Directory.CreateDirectory(saveDir);
 
             // we know the saveDir exists now, so append the filename to it in order to get the save file
-            _saveFile = Path.Join(saveDir, "tasks.json");
+            _saveFile = Path.Combine(saveDir, "tasks.json");
 
             // this is necessary in order to serialize a list of interfaces
             _serializerSettings = new JsonSerializerSettings()

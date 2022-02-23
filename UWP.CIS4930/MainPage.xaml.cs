@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using UWP.CIS4930.ViewModels;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -24,7 +25,28 @@ namespace UWP.CIS4930
     {
         public MainPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
+            DataContext = new MainPageViewModel();
+        }
+
+        private void SearchClick(object sender, RoutedEventArgs e)
+        {
+            (DataContext as MainPageViewModel).Search();
+        }
+
+        private void AddClick(object sender, RoutedEventArgs e)
+        {
+            (DataContext as MainPageViewModel).Add();
+        }
+
+        private void EditClick(object sender, RoutedEventArgs e)
+        {
+            (DataContext as MainPageViewModel).Edit();
+        }
+
+        private void DeleteClick(object sender, RoutedEventArgs e)
+        {
+            (DataContext as MainPageViewModel).Delete();
         }
     }
 }
