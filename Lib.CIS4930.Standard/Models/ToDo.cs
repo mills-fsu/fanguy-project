@@ -27,6 +27,14 @@ namespace Lib.CIS4930.Standard.Models
         /// </summary>
         public bool IsCompleted { get; set; }
 
+        public ToDo()
+        {
+            Name = "";
+            Description = "";
+            Deadline = DateTime.Now;
+            IsCompleted = false;
+        }
+
         public ToDo(string name, string description, DateTime deadline, bool isCompleted = false)
         {
             Name = name;

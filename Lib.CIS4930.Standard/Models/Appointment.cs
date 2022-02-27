@@ -13,6 +13,15 @@ namespace Lib.CIS4930.Standard.Models
         public DateTime End { get; set; }
         public List<string> Attendees { get; set; }
 
+        public Appointment()
+        {
+            Name = "";
+            Description = "";
+            Start = DateTime.Now;
+            End = DateTime.Now;
+            Attendees = new List<string>();
+        }
+
         public Appointment(string name, string description, DateTime start, DateTime end, List<string> attendees)
         {
             Name = name;

@@ -29,11 +29,6 @@ namespace UWP.CIS4930
             DataContext = new MainPageViewModel();
         }
 
-        private void SearchClick(object sender, RoutedEventArgs e)
-        {
-            (DataContext as MainPageViewModel).Search();
-        }
-
         private void AddClick(object sender, RoutedEventArgs e)
         {
             (DataContext as MainPageViewModel).Add();
@@ -47,6 +42,11 @@ namespace UWP.CIS4930
         private void DeleteClick(object sender, RoutedEventArgs e)
         {
             (DataContext as MainPageViewModel).Delete();
+        }
+
+        private void CompleteClick(object sender, RoutedEventArgs e)
+        {
+            (DataContext as MainPageViewModel).ToggleComplete();
         }
     }
 }

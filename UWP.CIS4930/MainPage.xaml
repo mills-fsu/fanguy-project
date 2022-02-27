@@ -10,27 +10,50 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="1*"></RowDefinition>
-            <RowDefinition Height="10*"></RowDefinition>
+            <RowDefinition Height="2*"></RowDefinition>
+            <RowDefinition Height="18*"></RowDefinition>
             <RowDefinition Height="1*"></RowDefinition>
         </Grid.RowDefinitions>
 
         <!-- Search Bar Row -->
         <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="3*"></ColumnDefinition>
-                <ColumnDefinition Width="1*"></ColumnDefinition>
-            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
             
             <!-- Search Bar -->
-            <TextBlock Grid.Column="0"></TextBlock>
-            <Button Content="Search" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="1" Click="SearchClick">                
-            </Button>
+            <TextBox 
+                Grid.Column="0"
+                Grid.Row="0"
+                PlaceholderText="Search..."
+                Text="{Binding Path=SearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            >
+            </TextBox>
+
+            <!-- ToDo Filter -->
+            <Grid Grid.Row="1" Margin="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                    <ColumnDefinition Width="9*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="Show ToDos: "></TextBlock>
+                <ComboBox
+                    Grid.Column="1"
+                    ItemsSource="{Binding Path=TodoFilters, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                    SelectedItem="{Binding Path=TodoFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                >
+                </ComboBox>
+            </Grid>
         </Grid>
 
         <!-- Main Content Row -->
         <Grid Grid.Row="1">
-            <ListBox>
+            <ListBox
+                ItemsSource="{Binding Path=Tasks, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                SelectedItem="{Binding Path=SelectedTask, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            >
             </ListBox>
         </Grid>
 
@@ -42,6 +65,38 @@
                 <ColumnDefinition Width="1*"></ColumnDefinition>
                 <ColumnDefinition Width="1*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
+            <Button 
+                Content="Add" 
+                HorizontalAlignment="Stretch" 
+                VerticalAlignment="Stretch" 
+                Grid.Column="0" 
+                Click="AddClick"
+            >
+            </Button>
+            <Button 
+                Content="Edit" 
+                HorizontalAlignment="Stretch" 
+                VerticalAlignment="Stretch" 
+                Grid.Column="1" 
+                Click="EditClick"
+            >
+            </Button>
+            <Button 
+                Content="Delete" 
+                HorizontalAlignment="Stretch" 
+                VerticalAlignment="Stretch" 
+                Grid.Column="2" 
+                Click="DeleteClick"
+            >
+            </Button>
+            <Button 
+                Content="Toggle Complete" 
+                HorizontalAlignment="Stretch" 
+                VerticalAlignment="Stretch" 
+                Grid.Column="3" 
+                Click="CompleteClick"
+            >
+            </Button>
         </Grid>
     </Grid>
 </Page>

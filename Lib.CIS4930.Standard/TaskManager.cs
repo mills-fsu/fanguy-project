@@ -74,6 +74,8 @@ namespace Lib.CIS4930.Standard
         // the internally managed list of tasks
         private ITaskService _taskService;
 
+        public ITaskService TaskService { get => _taskService; }
+
         // defines the type of a function to call within the for loop of the List function
         private delegate bool ListCondition(int index, int displayed, int startIndex, int numTasks, int taskCount);
 
@@ -123,6 +125,12 @@ namespace Lib.CIS4930.Standard
             _taskService.Save();
         }
 
+        public void Create(ITask task)
+        {
+            _taskService.Tasks.Add(task);
+            _taskService.Save();
+        }
+
         /// <summary>
         /// Remove the Task at the given index from the manager.
         /// </summary>
@@ -136,6 +144,18 @@ namespace Lib.CIS4930.Standard
             }
 
             _taskService.Tasks.RemoveAt(index);
+            _taskService.Save();
+        }
+
+        public void Update(int index, ITask newValues)
+        {
+            // if outside the bounds, return without doing anything
+            if (index < 0 || index >= _taskService.Tasks.Count)
+            {
+                return;
+            }
+
+            _taskService.Tasks[index] = newValues;
             _taskService.Save();
         }
 
@@ -372,7 +392,7 @@ namespace Lib.CIS4930.Standard
         {
             // we will do all comparisons ignoring case, so this just reduces having to retype the whole
             // thing on every comparison
-            var ignoreCase = StringComparison.OrdinalIgnoreCase;
+            //var ignoreCase = StringComparison.OrdinalIgnoreCase;
 
             var results = new List<ITask>();
             foreach (var task in _taskService.Tasks)
