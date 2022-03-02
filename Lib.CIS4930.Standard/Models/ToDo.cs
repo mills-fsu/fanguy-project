@@ -46,7 +46,7 @@ namespace Lib.CIS4930.Standard.Models
         public override string ToString()
         {
             // if completed, show a filled checkbox, empty otherwise
-            var checkbox = IsCompleted ? "[X]" : "[ ]";
+            var checkbox = IsCompleted ? "✔️" : "🔘";
 
             // convert the deadline to the format m/d/yyyy
             var dueDate = Deadline.ToShortDateString();

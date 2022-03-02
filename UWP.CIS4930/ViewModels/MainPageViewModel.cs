@@ -121,6 +121,7 @@ namespace UWP.CIS4930.ViewModels
         {
             var indexToDelete = tasks.IndexOf(SelectedTask);
             taskManager.Delete(indexToDelete);
+
             NotifyPropertyChanged(nameof(Tasks));
         }
 
@@ -142,6 +143,7 @@ namespace UWP.CIS4930.ViewModels
 
             var indexToDelete = tasks.IndexOf(SelectedTask);
             taskManager.EditIsCompleted(indexToDelete, !(selectedTask as ToDo).IsCompleted);
+
             NotifyPropertyChanged(nameof(Tasks));
         }
 

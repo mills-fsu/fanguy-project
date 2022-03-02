@@ -365,7 +365,7 @@ namespace Lib.CIS4930.Standard
             // choose which for loop condition we will use based on the list mode
             ListCondition condition = BothCondition;
 
-            if (mode == ListMode.TodosOnly)
+            if (mode == ListMode.AppointmentsOnly)
                 condition = OnlyCondition;
 
             int displayed = 0;

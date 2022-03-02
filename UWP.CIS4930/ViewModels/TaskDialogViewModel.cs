@@ -113,10 +113,7 @@ namespace UWP.CIS4930.ViewModels
             {
                 boundApptStartDate = value;
 
-                var appt = task as Appointment;
-
-                appt.Start = boundApptStartDate.Date;
-                appt.Start = appt.Start.Add(boundApptStartTime);
+                UpdateApptStart();
             }
         }
 
@@ -128,10 +125,7 @@ namespace UWP.CIS4930.ViewModels
             {
                 boundApptStartTime = value;
 
-                var appt = task as Appointment;
-
-                appt.Start = boundApptStartDate.Date;
-                appt.Start = appt.Start.Add(boundApptStartTime);
+                UpdateApptStart();
             }
         }
 
@@ -143,10 +137,7 @@ namespace UWP.CIS4930.ViewModels
             {
                 boundApptEndDate = value;
 
-                var appt = task as Appointment;
-
-                appt.End = boundApptEndDate.DateTime;
-                appt.End = appt.End.Add(boundApptEndTime);
+                UpdateApptEnd();
             }
         }
 
@@ -158,10 +149,7 @@ namespace UWP.CIS4930.ViewModels
             {
                 boundApptEndTime = value;
 
-                var appt = task as Appointment;
-
-                appt.End = boundApptEndDate.Date;
-                appt.End = appt.End.Add(boundApptEndTime);
+                UpdateApptEnd();
             }
         }
 
@@ -182,7 +170,6 @@ namespace UWP.CIS4930.ViewModels
 
         public TaskDialogViewModel(DialogMode mode, TaskManager taskManager, ITask startTask)
         {
-            //this.tasks = tasks;
             this.taskManager = taskManager;
             this.mode = mode;
 
@@ -280,6 +267,22 @@ namespace UWP.CIS4930.ViewModels
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void UpdateApptStart()
+        {
+            var appt = task as Appointment;
+
+            appt.Start = boundApptStartDate.Date;
+            appt.Start = appt.Start.Add(boundApptStartTime);
+        }
+
+        private void UpdateApptEnd()
+        {
+            var appt = task as Appointment;
+
+            appt.End = boundApptEndDate.Date;
+            appt.End = appt.End.Add(boundApptEndTime);
         }
     }
 }
