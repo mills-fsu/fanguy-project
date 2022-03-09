@@ -9,6 +9,7 @@ namespace Lib.CIS4930.Standard.Models
     {
         public string Name { get; set; }
         public string Description { get; set; }
+        public int Priority { get; set; }
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
         public List<string> Attendees { get; set; }
@@ -37,7 +38,14 @@ namespace Lib.CIS4930.Standard.Models
             var startTime = Start.ToString("g");
             var endTime = End.ToShortTimeString();
             var participants = string.Join(",", Attendees);
-            return $"{Name} [{startTime}-{endTime}]\n   notes: {Description}\n   participants: {participants}";
+
+            StringBuilder stars = new StringBuilder();
+            for (int i = 0; i < Priority && i < 5; i++)
+            {
+                stars.Append("⭐");
+            }
+
+            return $"{Name} [{startTime}-{endTime}] {stars}\n   notes: {Description}\n   participants: {participants}";
         }
     }
 }
