@@ -15,6 +15,13 @@ namespace UWP.CIS4930.ViewModels
 {
     public class MainPageViewModel : INotifyPropertyChanged
     {
+        public enum PrioritySortMode
+        {
+            HighToLow,
+            LowToHigh,
+            None,
+        }
+
         private TaskManager taskManager;
         private ObservableCollection<ITask> tasks;
 
@@ -59,6 +66,19 @@ namespace UWP.CIS4930.ViewModels
                         );
                 }
 
+                // finally, sort by priority
+                if (SortMode == PrioritySortMode.HighToLow)
+                {
+                    tasks = new ObservableCollection<ITask>(tasks.OrderByDescending(task => task.Priority).ToList());
+                }
+                else if (SortMode == PrioritySortMode.LowToHigh)
+                {
+                    tasks = new ObservableCollection<ITask>(tasks.OrderByDescending(task => task.Priority)
+                        .Reverse()
+                        .ToList());
+
+                }
+
                 return tasks;
             }
             set
@@ -93,6 +113,16 @@ namespace UWP.CIS4930.ViewModels
             get => new List<TodoFilterMode>() { TodoFilterMode.All, TodoFilterMode.NotComplete };
         }
 
+        public IEnumerable<PrioritySortMode> SortModes
+        {
+            get => new List<PrioritySortMode>() 
+            {
+                PrioritySortMode.None,
+                PrioritySortMode.HighToLow, 
+                PrioritySortMode.LowToHigh, 
+            };
+        }
+
         private TodoFilterMode todoFilter;
         public TodoFilterMode TodoFilter 
         {
@@ -100,6 +130,17 @@ namespace UWP.CIS4930.ViewModels
             set
             {
                 todoFilter = value;
+                NotifyPropertyChanged(nameof(Tasks));
+            }
+        }
+
+        private PrioritySortMode sortMode;
+        public PrioritySortMode SortMode
+        {
+            get => sortMode;
+            set
+            {
+                sortMode = value;
                 NotifyPropertyChanged(nameof(Tasks));
             }
         }

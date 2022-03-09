@@ -8,5 +8,6 @@ namespace Lib.CIS4930.Standard.Models
     {
         string Name { get; set; }
         string Description { get; set; }
+        int Priority { get; set; }
     }
 }

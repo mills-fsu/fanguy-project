@@ -18,6 +18,11 @@ namespace Lib.CIS4930.Standard.Models
         public string Description { get; set; }
 
         /// <summary>
+        /// The importance of the task between 1 and 5, where 5 is most important.
+        /// </summary>
+        public int Priority { get; set; }
+
+        /// <summary>
         /// When the Task should be completed by
         /// </summary>
         public DateTime Deadline { get; set; }
@@ -51,9 +56,15 @@ namespace Lib.CIS4930.Standard.Models
             // convert the deadline to the format m/d/yyyy
             var dueDate = Deadline.ToShortDateString();
 
+            StringBuilder stars = new StringBuilder();
+            for (int i = 0; i < Priority && i < 5; i++)
+            {
+                stars.Append("⭐");
+            }
+
             // finally, return these values formatted nicely
             // note 7 spaces before notes, this is 3 for the index + :, plus 4 for the '[ ] '
-            return $"{checkbox} {Name} (due {dueDate})\n       notes: {Description}";
+            return $"{checkbox} {Name} (due {dueDate})\n       priority: {stars}\n       notes: {Description}";
         }
     }
 }

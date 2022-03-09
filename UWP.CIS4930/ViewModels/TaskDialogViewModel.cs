@@ -238,6 +238,13 @@ namespace UWP.CIS4930.ViewModels
 
         private bool Validate()
         {
+            // if the user doesn't update the priority slider, the Task's priority will
+            // still be 0, which we don't want
+            if (Task.Priority == 0)
+            {
+                Task.Priority = 1;
+            }
+
             if (string.IsNullOrEmpty(task.Name))
             {
                 ErrorText += "Name must not be empty. ";
