@@ -119,6 +119,9 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\OpenDialog.xaml.cs">
+      <DependentUpon>OpenDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\TaskDialog.xaml.cs">
       <DependentUpon>TaskDialog.xaml</DependentUpon>
     </Compile>
@@ -127,6 +130,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\MainPageViewModel.cs" />
+    <Compile Include="ViewModels\OpenDialogViewModel.cs" />
     <Compile Include="ViewModels\TaskDialogViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -149,6 +153,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Dialogs\OpenDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\TaskDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

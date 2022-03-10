@@ -48,5 +48,10 @@ namespace UWP.CIS4930
         {
             (DataContext as MainPageViewModel).ToggleComplete();
         }
+
+        private void OpenNewFileClick(object sender, RoutedEventArgs e)
+        {
+            (DataContext as MainPageViewModel).OpenNewFile();
+        }
     }
 }

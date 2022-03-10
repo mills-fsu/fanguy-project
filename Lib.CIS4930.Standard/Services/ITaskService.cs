@@ -13,5 +13,7 @@ namespace Lib.CIS4930.Standard.Services
         void Save();
 
         void Load();
+
+        void Load(string filename);
     }
 }

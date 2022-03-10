@@ -31,20 +31,25 @@ namespace Lib.CIS4930.Standard.Services
         public List<ITask> Tasks { get; private set; }
 
         // the file name for the save data
-        private string _saveFile;
+        private string _savePath;
+        private string _saveFileName;
+
+        private string SaveFile { get => Path.Combine(_savePath, _saveFileName); }
 
         // the settings to use in the JSON conversion
         private JsonSerializerSettings _serializerSettings;
 
         private LocalTaskService()
         {
+            _saveFileName = "tasks.json";
+
             // create the save directory if it does not exist yet
-            var saveDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CIS4930");
-            if (!File.Exists(saveDir))
-                Directory.CreateDirectory(saveDir);
+            _savePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CIS4930");
+            if (!File.Exists(_savePath))
+                Directory.CreateDirectory(_savePath);
 
             // we know the saveDir exists now, so append the filename to it in order to get the save file
-            _saveFile = Path.Combine(saveDir, "tasks.json");
+            // _savePath = Path.Combine(_savePath, "tasks.json");
 
             // this is necessary in order to serialize a list of interfaces
             _serializerSettings = new JsonSerializerSettings()
@@ -62,7 +67,7 @@ namespace Lib.CIS4930.Standard.Services
         public void Save()
         {
             var jsonString = JsonConvert.SerializeObject(Tasks, _serializerSettings);
-            File.WriteAllText(_saveFile, jsonString);
+            File.WriteAllText(SaveFile, jsonString);
         }
 
         /// <summary>
@@ -71,13 +76,19 @@ namespace Lib.CIS4930.Standard.Services
         /// </summary>
         public void Load()
         {
-            if (File.Exists(_saveFile))
+            if (File.Exists(SaveFile))
             {
-                var jsonString = File.ReadAllText(_saveFile);
+                var jsonString = File.ReadAllText(SaveFile);
                 Tasks = JsonConvert.DeserializeObject<List<ITask>>(jsonString, _serializerSettings) ?? new List<ITask>();
             }
             else
                 Tasks = new List<ITask>();
+        }
+
+        public void Load(string filename)
+        {
+            _saveFileName = filename + ".json";
+            Load();
         }
     }
 }

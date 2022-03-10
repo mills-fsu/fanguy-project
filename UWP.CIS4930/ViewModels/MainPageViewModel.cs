@@ -188,6 +188,14 @@ namespace UWP.CIS4930.ViewModels
             NotifyPropertyChanged(nameof(Tasks));
         }
 
+        public async void OpenNewFile()
+        {
+            var dialog = new OpenDialog(taskManager.TaskService);
+            await dialog.ShowAsync();
+
+            NotifyPropertyChanged(nameof(Tasks));
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
