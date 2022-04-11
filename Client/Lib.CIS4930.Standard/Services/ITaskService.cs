@@ -11,6 +11,8 @@ namespace Lib.CIS4930.Standard.Services
         List<ITask> Tasks { get; }
 
         void Save();
+        void Save(ITask task);
+        void Delete(ITask task);
 
         void Load();
     }

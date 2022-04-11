@@ -1,12 +1,16 @@
-﻿using System;
+﻿using Lib.CIS4930.Standard.Utils;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Lib.CIS4930.Standard.Models
 {
+    [JsonConverter(typeof(TaskJsonConverter))]
     [Serializable]
     public class Appointment : ITask
     {
+        public Guid Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public int Priority { get; set; }
@@ -16,6 +20,7 @@ namespace Lib.CIS4930.Standard.Models
 
         public Appointment()
         {
+            Id = Guid.NewGuid();
             Name = "";
             Description = "";
             Start = DateTime.Now;
@@ -25,6 +30,7 @@ namespace Lib.CIS4930.Standard.Models
 
         public Appointment(string name, string description, DateTime start, DateTime end, List<string> attendees)
         {
+            Id = Guid.NewGuid();
             Name = name;
             Description = description;
             Start = start;

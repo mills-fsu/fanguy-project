@@ -65,6 +65,16 @@ namespace Lib.CIS4930.Standard.Services
             File.WriteAllText(_saveFile, jsonString);
         }
 
+        public void Save(ITask task)
+        {
+            Save();
+        }
+
+        public void Delete(ITask task)
+        {
+            Save();
+        }
+
         /// <summary>
         /// Load the JSON file and initialize the Tasks list with its data if possible; otherwise
         /// set Tasks to an empty list.

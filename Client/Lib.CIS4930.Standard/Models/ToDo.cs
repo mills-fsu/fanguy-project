@@ -7,6 +7,7 @@ namespace Lib.CIS4930.Standard.Models
     [Serializable]
     public class ToDo : ITask
     {
+        public Guid Id { get; set; }
         /// <summary>
         /// The display name of the to-do Task
         /// </summary>
@@ -34,6 +35,7 @@ namespace Lib.CIS4930.Standard.Models
 
         public ToDo()
         {
+            Id = Guid.NewGuid();
             Name = "";
             Description = "";
             Deadline = DateTime.Now;
@@ -42,6 +44,7 @@ namespace Lib.CIS4930.Standard.Models
 
         public ToDo(string name, string description, DateTime deadline, bool isCompleted = false)
         {
+            Id = Guid.NewGuid();
             Name = name;
             Description = description;
             Deadline = deadline;

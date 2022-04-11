@@ -81,7 +81,8 @@ namespace Lib.CIS4930.Standard
 
         public TaskManager()
         {
-            _taskService = LocalTaskService.Instance;
+            //_taskService = LocalTaskService.Instance;
+            _taskService = RemoteTaskService.Instance;
         }
 
         /// <summary>
@@ -107,8 +108,9 @@ namespace Lib.CIS4930.Standard
         /// <param name="deadline">when the ToDo is due</param>
         public void Create(string name, string description, DateTime deadline)
         {
-            _taskService.Tasks.Add(new ToDo(name, description, deadline));
-            _taskService.Save();
+            var newTask = new ToDo(name, description, deadline);
+            _taskService.Tasks.Add(newTask);
+            _taskService.Save(newTask);
         }
 
         /// <summary>
@@ -121,14 +123,15 @@ namespace Lib.CIS4930.Standard
         /// <param name="attendees">a list of the other attendees</param>
         public void Create(string name, string description, DateTime start, DateTime end, IEnumerable<string> attendees)
         {
-            _taskService.Tasks.Add(new Appointment(name, description, start, end, attendees.ToList()));
-            _taskService.Save();
+            var newTask = new Appointment(name, description, start, end, attendees.ToList());
+            _taskService.Tasks.Add(newTask);
+            _taskService.Save(newTask);
         }
 
         public void Create(ITask task)
         {
             _taskService.Tasks.Add(task);
-            _taskService.Save();
+            _taskService.Save(task);
         }
 
         /// <summary>
@@ -143,8 +146,9 @@ namespace Lib.CIS4930.Standard
                 return;
             }
 
+            var deletedTask = _taskService.Tasks[index];
             _taskService.Tasks.RemoveAt(index);
-            _taskService.Save();
+            _taskService.Delete(deletedTask);
         }
 
         public void Update(int index, ITask newValues)
@@ -156,7 +160,7 @@ namespace Lib.CIS4930.Standard
             }
 
             _taskService.Tasks[index] = newValues;
-            _taskService.Save();
+            _taskService.Save(newValues);
         }
 
         /// <summary>
@@ -173,7 +177,7 @@ namespace Lib.CIS4930.Standard
             }
 
             _taskService.Tasks[index].Name = newName;
-            _taskService.Save();
+            _taskService.Save(_taskService.Tasks[index]);
         }
 
         /// <summary>
@@ -190,7 +194,7 @@ namespace Lib.CIS4930.Standard
             }
 
             _taskService.Tasks[index].Description = newDescription;
-            _taskService.Save();
+            _taskService.Save(_taskService.Tasks[index]);
         }
 
         /// <summary>
@@ -211,7 +215,7 @@ namespace Lib.CIS4930.Standard
             if (task is ToDo todo)
                 todo.Deadline = newDeadline;
 
-            _taskService.Save();
+            _taskService.Save(_taskService.Tasks[index]);
         }
 
         /// <summary>
@@ -232,7 +236,7 @@ namespace Lib.CIS4930.Standard
             if (task is ToDo todo)
                 todo.IsCompleted = newIsCompleted;
 
-            _taskService.Save();
+            _taskService.Save(_taskService.Tasks[index]);
         }
 
         /// <summary>
@@ -253,7 +257,7 @@ namespace Lib.CIS4930.Standard
             if (task is Appointment appt)
                 appt.Start = newStart;
 
-            _taskService.Save();
+            _taskService.Save(_taskService.Tasks[index]);
         }
 
         /// <summary>
@@ -274,7 +278,7 @@ namespace Lib.CIS4930.Standard
             if (task is Appointment appt)
                 appt.Start = newEnd;
 
-            _taskService.Save();
+            _taskService.Save(_taskService.Tasks[index]);
         }
 
         /// <summary>
@@ -295,7 +299,7 @@ namespace Lib.CIS4930.Standard
             if (task is Appointment appt)
                 appt.Attendees = newAttendees.ToList();
 
-            _taskService.Save();
+            _taskService.Save(_taskService.Tasks[index]);
         }
 
         /// <summary>
@@ -315,7 +319,7 @@ namespace Lib.CIS4930.Standard
             if (task is ToDo todo)
                 todo.IsCompleted = true;
 
-            _taskService.Save();
+            _taskService.Save(_taskService.Tasks[index]);
         }
 
         /// <summary>
