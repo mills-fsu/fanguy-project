@@ -11,9 +11,18 @@ namespace Server.CIS4930.Controllers
     public class TaskController : ControllerBase
     {
         [HttpGet()]
-        public IEnumerable<ITask> Get()
+        public IEnumerable<ITask> Get(string? searchString = null)
         {
-            return FakeDB.Tasks;
+            if (searchString == null)
+                return FakeDB.Tasks;
+            else
+            {
+                return FakeDB.Tasks
+                    .Where(task => 
+                           task.Name.Contains(searchString, StringComparison.CurrentCultureIgnoreCase) || 
+                           task.Description.Contains(searchString, StringComparison.CurrentCultureIgnoreCase) ||
+                           task.Id.Equals(searchString));
+            }
         }
 
         [HttpPost()]
