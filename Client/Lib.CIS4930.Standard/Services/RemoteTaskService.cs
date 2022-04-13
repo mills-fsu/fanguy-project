@@ -28,6 +28,8 @@ namespace Lib.CIS4930.Standard.Services
         private string _baseURL;
         private string _tasksEndpoint => _baseURL + "tasks";
 
+        private string _deleteEndpoint => _tasksEndpoint + "/delete";
+
         private RemoteTaskService()
         {
             _baseURL = "http://localhost:46993/api/";
@@ -52,7 +54,7 @@ namespace Lib.CIS4930.Standard.Services
 
         public async void Delete(ITask task)
         {
-            await new WebRequestHandler().Delete(_tasksEndpoint, task);
+            await new WebRequestHandler().Post(_deleteEndpoint, task);
         }
     }
 }

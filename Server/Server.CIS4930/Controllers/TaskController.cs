@@ -32,7 +32,7 @@ namespace Server.CIS4930.Controllers
             return StatusCode(200);
         }
 
-        [HttpDelete()]
+        [HttpPost("delete")]
         public StatusCodeResult Delete([FromBody] ITask task)
         {
             new TaskEC().Delete(task);
