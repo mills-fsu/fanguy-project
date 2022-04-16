@@ -9,3 +9,8 @@
 
 - branch: assignment-2
 - video: [here](https://youtu.be/ANLRdH3Rii4)
+
+## Assignment 4
+
+- branch: assignment-3
+- video: [here](https://youtu.be/7nfCKm1UmdQ)
