@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Lib.CIS4930.Standard.Services
 {
@@ -13,6 +14,7 @@ namespace Lib.CIS4930.Standard.Services
         void Save();
         void Save(ITask task);
         void Delete(ITask task);
+        Task Search(string query);
 
         void Load();
     }

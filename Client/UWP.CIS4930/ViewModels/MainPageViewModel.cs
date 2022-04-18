@@ -28,9 +28,17 @@ namespace UWP.CIS4930.ViewModels
                 if (tasks.Count > 0)
                     tasks.Clear();
 
+                if (searchString == "") 
+                    searchString = null;
+
+                //taskManager.Search(searchString);
+                taskManager.TaskService.Tasks.ForEach(tasks.Add);
+
+                /*
                 if (!string.IsNullOrEmpty(searchString))
                 {
                     // we filter by search value
+                    //
                     taskManager.TaskService.Tasks
                         .Where(task =>
                             task.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase) ||
@@ -41,11 +49,15 @@ namespace UWP.CIS4930.ViewModels
                         )
                         .ToList()
                         .ForEach(tasks.Add);
+                    //
+                    taskManager.Search(searchString);
+                    taskManager.TaskService.Tasks.ForEach(tasks.Add);
                 }
                 else
                 {
                     taskManager.TaskService.Tasks.ForEach(tasks.Add);
                 }
+                */
 
                 // next, filter by todo filter mode
                 if (TodoFilter == TodoFilterMode.NotComplete)
@@ -144,6 +156,12 @@ namespace UWP.CIS4930.ViewModels
             var indexToDelete = tasks.IndexOf(SelectedTask);
             taskManager.EditIsCompleted(indexToDelete, !(selectedTask as ToDo).IsCompleted);
 
+            NotifyPropertyChanged(nameof(Tasks));
+        }
+
+        public async void Search()
+        {
+            await taskManager.Search(searchString);
             NotifyPropertyChanged(nameof(Tasks));
         }
 

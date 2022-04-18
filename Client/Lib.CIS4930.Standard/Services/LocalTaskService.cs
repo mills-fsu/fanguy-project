@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Lib.CIS4930.Standard.Services
 {
@@ -88,6 +89,11 @@ namespace Lib.CIS4930.Standard.Services
             }
             else
                 Tasks = new List<ITask>();
+        }
+
+        public async Task Search(string query)
+        {
+            // pass
         }
     }
 }

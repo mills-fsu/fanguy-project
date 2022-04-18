@@ -23,13 +23,26 @@
             </Grid.RowDefinitions>
             
             <!-- Search Bar -->
-            <TextBox 
-                Grid.Column="0"
-                Grid.Row="0"
-                PlaceholderText="Search..."
-                Text="{Binding Path=SearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-            >
-            </TextBox>
+            <Grid Grid.Column="0" Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="9*"></ColumnDefinition>
+                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <TextBox 
+                    Grid.Column="0"
+                    Grid.Row="0"
+                    PlaceholderText="Search..."
+                    Text="{Binding Path=SearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                >
+                </TextBox>
+                <Button
+                    Grid.Column="1"
+                    Grid.Row="0"
+                    Content="Search"
+                    Click="SearchClick"
+                >
+                </Button>
+            </Grid>
 
             <!-- ToDo Filter -->
             <Grid Grid.Row="1" Margin="2">

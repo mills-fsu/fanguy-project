@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Lib.CIS4930.Standard.Services
 {
@@ -29,6 +30,8 @@ namespace Lib.CIS4930.Standard.Services
         private string _tasksEndpoint => _baseURL + "tasks";
 
         private string _deleteEndpoint => _tasksEndpoint + "/delete";
+
+        private string _searchEndpoint => _tasksEndpoint + "?searchString=";
 
         private RemoteTaskService()
         {
@@ -55,6 +58,19 @@ namespace Lib.CIS4930.Standard.Services
         public async void Delete(ITask task)
         {
             await new WebRequestHandler().Post(_deleteEndpoint, task);
+        }
+
+        public async Task Search(string query)
+        {
+            string endpoint;
+
+            if (query == null)
+                endpoint = _tasksEndpoint;
+            else
+                endpoint = _searchEndpoint + query;
+
+            var res = await new WebRequestHandler().Get(endpoint);
+            Tasks = JsonConvert.DeserializeObject<List<ITask>>(res) ?? new List<ITask>();
         }
     }
 }

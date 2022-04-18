@@ -13,7 +13,7 @@ namespace Server.CIS4930.Controllers
         [HttpGet()]
         public IEnumerable<ITask> Get(string? searchString = null)
         {
-            if (searchString == null)
+            if (string.IsNullOrEmpty(searchString))
                 return FakeDB.Tasks;
             else
             {

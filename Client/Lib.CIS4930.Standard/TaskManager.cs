@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Lib.CIS4930.Standard
 {
@@ -392,12 +393,14 @@ namespace Lib.CIS4930.Standard
         /// Search all possible data fields of every Task for the search term and print the results
         /// </summary>
         /// <param name="searchTerm">the substring to check each field for</param>
-        public void Search(string searchTerm)
+        public async Task Search(string searchTerm)
         {
             // we will do all comparisons ignoring case, so this just reduces having to retype the whole
             // thing on every comparison
             //var ignoreCase = StringComparison.OrdinalIgnoreCase;
+            await _taskService.Search(searchTerm);
 
+            /*
             var results = new List<ITask>();
             foreach (var task in _taskService.Tasks)
             {
@@ -455,6 +458,7 @@ namespace Lib.CIS4930.Standard
                     Console.WriteLine($"{i}: {task}");
                 }
             }
+            */
         }
 
         /// <summary>
