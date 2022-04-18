@@ -18,4 +18,4 @@
 ## Assignment 4
 
 - branch: assignment-4
-- video: [here](https://youtu.be/7nfCKm1UmdQ)
+- video: [here](https://youtu.be/0y_mbN4uFUg)
