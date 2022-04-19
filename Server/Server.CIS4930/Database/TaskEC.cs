@@ -1,84 +1,89 @@
 ﻿using Lib.CIS4930.Standard.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Server.CIS4930.Database
 {
     public class TaskEC
     {
+        private DataContext db;
+
+        public TaskEC(DataContext context)
+        {
+            db = context;
+        }
+
+        public async Task<IEnumerable<ITask>> Query(string? searchString)
+        {
+            List<ITask> tasks = new();
+
+            if (searchString == null)
+            {
+                await db.ToDos.ForEachAsync(t => tasks.Add(t.Into()));
+                await db.Appointments.ForEachAsync(a => tasks.Add(a.Into()));
+            }
+            else
+            {
+                await db.ToDos
+                    .Where(todo => todo.Name.Contains(searchString) || 
+                                   todo.Description.Contains(searchString) ||
+                                   todo.Id.Equals(searchString))
+                    .ForEachAsync(todo => tasks.Add(todo.Into()));
+
+                await db.Appointments
+                    .Where(appt => appt.Name.Contains(searchString) ||
+                                   appt.Description.Contains(searchString) ||
+                                   appt.Id.Equals(searchString))
+                    .ForEachAsync(appt => tasks.Add(appt.Into()));
+            }
+
+            return tasks;
+        }
+
         public void AddOrUpdate(ITask newTask)
         {
             if (newTask is ToDo todo)
             {
-                if (ExistsOn(todo, FakeDB.Todos))
+                
+                if (db.ToDos.Where(t => t.Id == todo.Id).Any())
                 {
-                    // update
-                    for (int i = 0; i < FakeDB.Todos.Count; ++i)
-                    {
-                        if (FakeDB.Todos[i].Id.Equals(todo.Id))
-                        {
-                            FakeDB.Todos[i] = todo;
-                            break;
-                        }
-                    }
+                    var toUpdate = db.ToDos.Where(t => t.Id == todo.Id).First();
+                    toUpdate.Update(todo);
                 }
-                else
-                {
-                    // add
-                    FakeDB.Todos.Add(todo);
-                }
+                else 
+                    db.ToDos.Add(new Models.ToDoModel(todo));
             }
             else if (newTask is Appointment appt)
             {
-                if (ExistsOn(appt, FakeDB.Appointments))
+                if (db.Appointments.Where(t => t.Id == appt.Id).Any())
                 {
-                    // update
-                    for (int i = 0; i < FakeDB.Appointments.Count; ++i)
-                    {
-                        if (FakeDB.Appointments[i].Id.Equals(appt.Id))
-                        {
-                            FakeDB.Appointments[i] = appt;
-                            break;
-                        }
-                    }
+                    var toUpdate = db.Appointments.Where(t => t.Id == appt.Id).First();
+                    toUpdate.Update(appt);
                 }
                 else
-                {
-                    // add
-                    FakeDB.Appointments.Add(appt);
-                }
+                    db.Appointments.Add(new Models.AppointmentModel(appt));
             }
+
+            db.SaveChangesAsync().Wait();
         }
 
         public void Delete(ITask oldTask)
         {
             if (oldTask is ToDo todo)
             {
-                for (int i = 0; i < FakeDB.Todos.Count; ++i)
-                {
-                    if (FakeDB.Todos[i].Id.Equals(todo.Id))
-                    {
-                        FakeDB.Todos.RemoveAt(i);
-                        break;
-                    }
-                }
+                var toDelete = db.ToDos.Where(t => t.Id == todo.Id).FirstOrDefault();
+
+                if (toDelete != null)
+                    db.ToDos.Remove(toDelete);
             }
             else if (oldTask is Appointment appt)
             {
-                for (int i = 0; i < FakeDB.Appointments.Count; ++i)
-                {
-                    if (FakeDB.Appointments[i].Id.Equals(appt.Id))
-                    {
-                        FakeDB.Appointments.RemoveAt(i);
-                        break;
-                    }
-                }
-            }
-        }
+                var toDelete = db.Appointments.Where(a => a.Id == appt.Id).FirstOrDefault();
 
-        private bool ExistsOn(ITask check, IEnumerable<ITask> container)
-        {
-            return container
-                    .Where(item => item.Id.Equals(check.Id))
-                    .Any();
+                if (toDelete != null)
+                    db.Appointments.Remove(toDelete);
+            }
+
+            db.SaveChangesAsync().Wait();
         }
     }
 }

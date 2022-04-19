@@ -361,3 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Server/Server.CIS4930/tasks.db-shm
+/Server/Server.CIS4930/tasks.db-wal

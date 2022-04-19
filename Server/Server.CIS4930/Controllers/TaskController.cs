@@ -10,32 +10,30 @@ namespace Server.CIS4930.Controllers
     [ApiController]
     public class TaskController : ControllerBase
     {
+        private readonly DataContext db;
+
+        public TaskController(DataContext context)
+        {
+            db = context;
+        }
+
         [HttpGet()]
         public IEnumerable<ITask> Get(string? searchString = null)
         {
-            if (string.IsNullOrEmpty(searchString))
-                return FakeDB.Tasks;
-            else
-            {
-                return FakeDB.Tasks
-                    .Where(task => 
-                           task.Name.Contains(searchString, StringComparison.CurrentCultureIgnoreCase) || 
-                           task.Description.Contains(searchString, StringComparison.CurrentCultureIgnoreCase) ||
-                           task.Id.Equals(searchString));
-            }
+            return new TaskEC(db).Query(searchString).Result;
         }
 
         [HttpPost()]
         public StatusCodeResult Post([FromBody] ITask task) 
         {
-            new TaskEC().AddOrUpdate(task);
+            new TaskEC(db).AddOrUpdate(task);
             return StatusCode(200);
         }
 
         [HttpPost("delete")]
         public StatusCodeResult Delete([FromBody] ITask task)
         {
-            new TaskEC().Delete(task);
+            new TaskEC(db).Delete(task);
             return StatusCode(200);
         }
     }
